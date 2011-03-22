@@ -36,63 +36,74 @@ Porthole.WindowProxy = function WindowProxy(proxyIFrameUrl, targetWindowName) {
 
 	this.eventListeners = [];
 	this.origin = window.location.protocol + '//' + window.location.host;
-	
-	this.proxyIFrameName = this.targetWindowName + 'ProxyIFrame';
-	this.proxyIFrameLocation = proxyIFrameUrl;
 
-	// Create the proxy iFrame and add to dom
-	this.proxyIFrameElement = this.createIFrameProxy();
-}
+	if (proxyIFrameUrl != null) {	
+		this.proxyIFrameName = this.targetWindowName + 'ProxyIFrame';
+		this.proxyIFrameLocation = proxyIFrameUrl;
 
-/* 
-	Create an iframe and load the proxy
-*/
-Porthole.WindowProxy.prototype.createIFrameProxy = function() {
-	var el = document.createElement("iframe");
-	el.setAttribute('id', this.proxyIFrameName);
-	el.setAttribute('name', this.proxyIFrameName);
-	el.setAttribute('width', 0);
-	el.setAttribute('height', 0);
-	el.setAttribute('style', "position: absolute; left: -150px; top: 0px;");
-	document.body.appendChild(el);
-	el.setAttribute('src', this.proxyIFrameLocation);
-	return el;
-}
-
-/* 
-	Post a message to the target window only if the content comes from the target origin
-*/
-Porthole.WindowProxy.prototype.postMessage = function(data, targetOrigin) {
-	if (targetOrigin == null) {
-		targetOrigin = '*';
+		// Create the proxy iFrame and add to dom
+		this.proxyIFrameElement = this.createIFrameProxy();
+	} else {
+		// Won't be able to send messages
+		this.proxyIFrameElement = null;
 	}
-	sourceWindowName = window.name;
-	this.proxyIFrameElement.contentWindow.location = this.proxyIFrameLocation + '#' + data +
-		'&sourceOrigin=' + escape(this.origin) + 
-		'&targetOrigin=' + escape(targetOrigin) + 
-		'&sourceWindowName=' + sourceWindowName + 
-		'&targetWindowName=' + this.targetWindowName;
-	this.proxyIFrameElement.height = this.proxyIFrameElement.height > 0 ? 0 : 1;
-};
-
-Porthole.WindowProxy.prototype.addEventListener = function(f) {
-	this.eventListeners.push(f);
 }
 
-Porthole.WindowProxy.prototype.removeEventListener = function(f) {
-	this.eventListeners = this.eventListeners.splice(this.eventListeners.indexOf(f), 1);
-}
-
-Porthole.WindowProxy.prototype.onMessageEvent = function(e) {
-	for (var i = 0; i < this.eventListeners.length; i++) {
-		try {
-    	this.eventListeners[i](e);
-		} catch(ex) {
-			console.error("Exception trying to call back listener: " + ex);
+Porthole.WindowProxy.prototype = {
+	/*
+		Create an iframe and load the proxy
+	*/
+	createIFrameProxy: function() {
+		var el = document.createElement("iframe");
+		el.setAttribute('id', this.proxyIFrameName);
+		el.setAttribute('name', this.proxyIFrameName);
+		el.setAttribute('width', 0);
+		el.setAttribute('height', 0);
+		el.setAttribute('style', "position: absolute; left: -150px; top: 0px;");
+		document.body.appendChild(el);
+		var loc = this.proxyIFrameLocation;
+		setTimeout(function(){el.setAttribute('src', loc);}, 100);
+		return el;
+	},
+	
+	/* 
+		Post a message to the target window only if the content comes from the target origin
+	*/
+	postMessage: function(data, targetOrigin) {
+		if (targetOrigin == null) {
+			targetOrigin = '*';
 		}
-  }
-}
+		if (this.proxyIFrameElement == null) {
+			console.error("Can't send message because no proxy url was passed in the constructor");
+		} else {
+			sourceWindowName = window.name;
+			this.proxyIFrameElement.setAttribute('src', this.proxyIFrameLocation + '#' + data +
+				'&sourceOrigin=' + escape(this.origin) + 
+				'&targetOrigin=' + escape(targetOrigin) + 
+				'&sourceWindowName=' + sourceWindowName + 
+				'&targetWindowName=' + this.targetWindowName);
+			this.proxyIFrameElement.height = this.proxyIFrameElement.height > 50 ? 50 : 100;
+		}
+	},
 
+	addEventListener: function(f) {
+		this.eventListeners.push(f);
+	},
+
+	removeEventListener: function(f) {
+		this.eventListeners = this.eventListeners.splice(this.eventListeners.indexOf(f), 1);
+	},
+
+	onMessageEvent: function(e) {
+		for (var i = 0; i < this.eventListeners.length; i++) {
+			try {
+	    	this.eventListeners[i](e);
+			} catch(ex) {
+				console.error("Exception trying to call back listener: " + ex);
+			}
+	  }
+	}
+};
 /* 
 	Convinience method to split a message of type param=value&param2=value2
 	and return an array such as ['param':value, 'param2':value2]
@@ -103,7 +114,7 @@ Porthole.WindowProxy.splitMessageParameters = function(message) {
 	for (var keyValuePairIndex in pairs) {
 		var nameValue = pairs[keyValuePairIndex].split(/=/);
 		if (typeof(nameValue[1]) == 'undefined') {
-			hash[nameValue[0]] = true;
+			hash[nameValue[0]] = '';
 		} else {
 			hash[nameValue[0]] = nameValue[1];
 		}
@@ -122,82 +133,93 @@ Porthole.MessageEvent = function MessageEvent(data, origin, source) {
 /*
 	Dispatch event messages to the correct target window
 */
-Porthole.WindowProxyDispatcher = function() {};
-
+Porthole.WindowProxyDispatcher = {
 /*
-	Forward a message event to the target window
+		Forward a message event to the target window
 */
-Porthole.WindowProxyDispatcher.forwardMessageEvent = function() {
-	var message = document.location.hash;
-	if (message.length > 0) {
-		// Eat the hash character
-		message = message.substr(1);
+	forwardMessageEvent: function() {
+		console.log("Porthole.WindowProxyDispatcher.forwardMessageEvent");
+		var message = document.location.hash;
+		if (message.length > 0) {
+			// Eat the hash character
+			message = message.substr(1);
 		
-		m = Porthole.WindowProxyDispatcher.parseMessage(message);
+			m = Porthole.WindowProxyDispatcher.parseMessage(message);
 
-		if (m.targetWindowName == '') {
-			targetWindow = top;
-		} else {
-			targetWindow = parent.frames[m.targetWindowName];
-		}
-		
-		var windowProxy = Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow(targetWindow, m.sourceWindowName);
-
-		if (windowProxy) {
-			if (windowProxy.origin == m.targetOrigin || m.targetOrigin == '*') {
-				e = new Porthole.MessageEvent(m.data, m.sourceOrigin, windowProxy);
-				windowProxy.onMessageEvent(e);
+			if (m.targetWindowName == '') {
+				targetWindow = top;
 			} else {
-				console.error("Target origin " + windowProxy.origin + " does not match desired target of " + m.targetOrigin);
+				targetWindow = parent.frames[m.targetWindowName];
 			}
-		} else {
-			console.error("Could not find window proxy object on the target window");
+		
+			var windowProxy = Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow(targetWindow, m.sourceWindowName);
+
+			if (windowProxy) {
+				if (windowProxy.origin == m.targetOrigin || m.targetOrigin == '*') {
+					e = new Porthole.MessageEvent(m.data, m.sourceOrigin, windowProxy);
+					windowProxy.onMessageEvent(e);
+				} else {
+					console.error("Target origin " + windowProxy.origin + " does not match desired target of " + m.targetOrigin);
+				}
+			} else {
+				console.error("Could not find window proxy object on the target window");
+			}
 		}
-	}
-}
+	},
 
-Porthole.WindowProxyDispatcher.parseMessage = function(message) {
-	params = Porthole.WindowProxy.splitMessageParameters(message);
-	var h = {targetOrigin:'', sourceOrigin:'', sourceWindowName:'', data:''};
-	h.targetOrigin = unescape(params['targetOrigin']);
-	h.sourceOrigin = unescape(params['sourceOrigin']);
-	h.sourceWindowName = unescape(params['sourceWindowName']);
-	h.targetWindowName = unescape(params['targetWindowName']);
-	var d = message.split(/&/);
-	if (d.length > 3) {
-		d.pop();
-		d.pop();
-		d.pop();
-		d.pop();
-		h.data = d.join('&');
-	}
-	return h;
-}
-
+	parseMessage: function(message) {
+		params = Porthole.WindowProxy.splitMessageParameters(message);
+		var h = {targetOrigin:'', sourceOrigin:'', sourceWindowName:'', data:''};
+		h.targetOrigin = unescape(params['targetOrigin']);
+		h.sourceOrigin = unescape(params['sourceOrigin']);
+		h.sourceWindowName = unescape(params['sourceWindowName']);
+		h.targetWindowName = unescape(params['targetWindowName']);
+		var d = message.split(/&/);
+		if (d.length > 3) {
+			d.pop();
+			d.pop();
+			d.pop();
+			d.pop();
+			h.data = d.join('&');
+		}
+		return h;
+	},
+	
 /*
-	Look for a window proxy object in the target window
+		Look for a window proxy object in the target window
 */
-Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow = function(w, sourceWindowName) {
-	if (w) {
-		for (var i in w) { 
-			// Ensure that we're finding the proxy object that is declared to be targetting the window that is calling us
-			if (w[i] != null && typeof(w[i]) == "object" 
-				&& w[i].constructor != null && w[i].constructor.name == 'WindowProxy' 
-				&& w[i].targetWindowName == sourceWindowName) { 
-				return w[i];
+	findWindowProxyObjectInWindow: function(w, sourceWindowName) {
+		console.log("Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow");
+		// IE does not enumerate global object on the window
+		if (w.RuntimeObject) {
+			w = w.RuntimeObject();
+		}
+		if (w) {
+			for (var i in w) { 
+				try {
+					// Ensure that we're finding the proxy object that is declared to be targetting the window that is calling us
+					if (w[i] != null && typeof(w[i]) == "object" && w[i].targetWindowName == sourceWindowName) { 
+						return w[i];
+					}
+				} catch(e) {
+					console.error("Can't access object: " + i);
+				}
 			}
 		}
-	}
-	return null;
-}
+		return null;
+	},
 
-Porthole.WindowProxyDispatcher.start = function() {
-	// This is needed so that two window from the same domain can communicate
-	document.domain = window.location.hostname;
-	var self = this;
-	if (window.addEventListener){
-		window.addEventListener('resize', function(event) {self.forwardMessageEvent();}, false); 
-	} else if (document.body.attachEvent){
-		window.attachEvent('onresize', function(event) {self.forwardMessageEvent();});
+	start: function() {
+		// This is needed so that two window from the same domain can communicate
+		document.domain = window.location.hostname;
+		var self = this;
+		if (window.addEventListener) {
+			window.addEventListener('resize', function(event) {self.forwardMessageEvent();}, false); 
+		} else if (document.body.attachEvent) {
+			window.attachEvent('onresize', function(event) {self.forwardMessageEvent();});
+		} else {
+			// Should never happen
+			console.error("Can't attach resize event");
+		}
 	}
-}
+};
