@@ -22,21 +22,21 @@
 
 var Porthole = (typeof Porthole == "undefined") || !Porthole ? {} : Porthole;
 
+function trace(s) {
+  try { console.log(s) } catch (e) { }
+};
+
 /*
 	Create a proxy window to post messages to target window
 */
 Porthole.WindowProxy = function WindowProxy(proxyIFrameUrl, targetWindowName) {
-	// This is needed so that two window from the same domain can communicate
-	document.domain = window.location.hostname;
-
 	if (targetWindowName == null) {
 		targetWindowName = '';
 	}
 	this.targetWindowName = targetWindowName;
 
 	this.eventListeners = [];
-	this.origin = window.location.protocol + '//' + window.location.host;
-
+	this.origin = window.location.protocol + '//' + window.location.host
 	if (proxyIFrameUrl != null) {	
 		this.proxyIFrameName = this.targetWindowName + 'ProxyIFrame';
 		this.proxyIFrameLocation = proxyIFrameUrl;
@@ -54,16 +54,21 @@ Porthole.WindowProxy.prototype = {
 		Create an iframe and load the proxy
 	*/
 	createIFrameProxy: function() {
-		var el = document.createElement("iframe");
-		el.setAttribute('id', this.proxyIFrameName);
-		el.setAttribute('name', this.proxyIFrameName);
-		el.setAttribute('width', 0);
-		el.setAttribute('height', 0);
-		el.setAttribute('style', "position: absolute; left: -150px; top: 0px;");
-		document.body.appendChild(el);
-		var loc = this.proxyIFrameLocation;
-		setTimeout(function(){el.setAttribute('src', loc);}, 100);
-		return el;
+		var iframe = document.createElement("iframe");
+		iframe.setAttribute('id', this.proxyIFrameName);
+		iframe.setAttribute('name', this.proxyIFrameName);
+		iframe.setAttribute('src', this.proxyIFrameLocation);
+		iframe.setAttribute('frameBorder', '1'); // IE needs this otherwise resize event is not fired
+		iframe.setAttribute('scrolling', 'auto');
+		iframe.setAttribute('width', 30);	// Need a certain size othwerise IE7 does not fire resize event
+		iframe.setAttribute('height', 30);
+		iframe.setAttribute('style', "position: absolute; left: -100px; top:0px;");
+		// IE needs this because setting style attribute is broken. No really.
+		if (iframe.style.setAttribute) {
+			iframe.style.setAttribute('cssText', "position: absolute; left: -100px; top:0px;");
+		}
+		document.body.appendChild(iframe);
+		return iframe;
 	},
 	
 	/* 
@@ -137,8 +142,8 @@ Porthole.WindowProxyDispatcher = {
 /*
 		Forward a message event to the target window
 */
-	forwardMessageEvent: function() {
-		console.log("Porthole.WindowProxyDispatcher.forwardMessageEvent");
+	forwardMessageEvent: function(e) {
+		trace("Porthole.WindowProxyDispatcher.forwardMessageEvent");
 		var message = document.location.hash;
 		if (message.length > 0) {
 			// Eat the hash character
@@ -189,8 +194,8 @@ Porthole.WindowProxyDispatcher = {
 		Look for a window proxy object in the target window
 */
 	findWindowProxyObjectInWindow: function(w, sourceWindowName) {
-		console.log("Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow");
-		// IE does not enumerate global object on the window
+		trace("Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow");
+		// IE does not enumerate global objects on the window object
 		if (w.RuntimeObject) {
 			w = w.RuntimeObject();
 		}
@@ -210,13 +215,10 @@ Porthole.WindowProxyDispatcher = {
 	},
 
 	start: function() {
-		// This is needed so that two window from the same domain can communicate
-		document.domain = window.location.hostname;
-		var self = this;
 		if (window.addEventListener) {
-			window.addEventListener('resize', function(event) {self.forwardMessageEvent();}, false); 
+			window.addEventListener('resize', Porthole.WindowProxyDispatcher.forwardMessageEvent, false); 
 		} else if (document.body.attachEvent) {
-			window.attachEvent('onresize', function(event) {self.forwardMessageEvent();});
+			window.attachEvent('onresize', Porthole.WindowProxyDispatcher.forwardMessageEvent);
 		} else {
 			// Should never happen
 			console.error("Can't attach resize event");
