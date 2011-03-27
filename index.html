@@ -2,10 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Porthole Demo</title>
-		<script type="text/javascript" src="porthole.js"></script>
+		<script type="text/javascript" src="js/porthole.js"></script>
 		<script type="text/javascript">
+			var guestDomain = 'demo.auberger.com';
+			
 			function onMessage1(messageEvent) {  
-				if (messageEvent.origin == "http://xyz.com") {
+				if (messageEvent.origin == "http://" + guestDomain) {
 					var parameters = Porthole.WindowProxy.splitMessageParameters(messageEvent.data);
 					if (parameters["color"]) {
 						document.body.bgColor = parameters["color"];
@@ -26,7 +28,7 @@
 				messages for instance.
 			*/
 			function onMessage2(messageEvent) { 
-				if (messageEvent.origin == "http://xyz.com") {
+				if (messageEvent.origin == "http://" + guestDomain) {
 					var parameters = Porthole.WindowProxy.splitMessageParameters(messageEvent.data);
 					if (parameters["color"]) {
 						document.body.bgColor = parameters["color"];
@@ -45,11 +47,11 @@
 			var windowProxy1, windowProxy2;
 			window.onload=function(){ 
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy1 = new Porthole.WindowProxy('http://xyz.com/proxy.html', 'guestFrame1');
+					windowProxy1 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole/proxy.html', 'guestFrame1');
 					windowProxy1.addEventListener(onMessage1);
 
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy2 = new Porthole.WindowProxy('http://xyz.com/proxy.html', 'guestFrame2');
+					windowProxy2 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole/proxy.html', 'guestFrame2');
 					windowProxy2.addEventListener(onMessage2);
 			};
 		</script>
@@ -67,11 +69,11 @@
 		</div>
 		<div>
 			<h3>Frame 1</h3>
-			<iframe id="guestFrame1" name="guestFrame1" width="500px" height="150px" frameborder="1" src="http://xyz.com/index.html" scrolling="no"></iframe>
+			<iframe id="guestFrame1" name="guestFrame1" width="500px" height="150px" frameborder="1" src="http://demo.auberger.com/porthole/" scrolling="no"></iframe>
 		</div>
 		<div>
 			<h3>Frame 2</h3>
-			<iframe id="guestFrame2" name="guestFrame2" width="500px" height="150px" frameborder="1" src="http://xyz.com/index.html" scrolling="no"></iframe>
+			<iframe id="guestFrame2" name="guestFrame2" width="500px" height="150px" frameborder="1" src="http://demo.auberger.com/porthole/" scrolling="no"></iframe>
 		</div>
 	</body>
 </html>

@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2011 Ternary Labs. All Rights Reserved.
+	Copyright (c) 2011 Georges Auberger. All Rights Reserved.
 	
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,23 @@
 	THE SOFTWARE.
 */
 
+/*
+	# Websequencediagrams.com
+	participant abc.com
+	participant "iFrame proxy xyz.com"
+	participant "iFrame proxy abc.com"
+	participant "iFrame xyz.com"
+	abc.com->iFrame proxy xyz.com: postMessage(data, targetOrigin)
+	note left of "iFrame proxy xyz.com": Set hash and change size
+	iFrame proxy xyz.com->iFrame proxy xyz.com: onResize Event
+	note right of "iFrame proxy xyz.com": read hash
+	iFrame proxy xyz.com->iFrame xyz.com: forwardMessageEvent(event)
+	iFrame xyz.com->iFrame proxy abc.com: postMessage(data, targetOrigin)
+	note right of "iFrame proxy abc.com": Set hash and change size
+	iFrame proxy abc.com->iFrame proxy abc.com: onResize Event
+	note right of "iFrame proxy abc.com": read hash
+	iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
+*/
 var Porthole = (typeof Porthole == "undefined") || !Porthole ? {} : Porthole;
 
 function trace(s) {
