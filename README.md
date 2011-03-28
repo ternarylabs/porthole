@@ -7,7 +7,7 @@ Include the javascript.
 	<script type="text/javascript" src="porthole.js"></script>
 
 Create your content iFrame. This is where the guest content lives. Make sure to give it a name.
-	<iframe id="guestFrame" name="guestFrame" width="500px" height="150px" frameborder="1" src="http://other-domain.com/" scrolling="no"></iframe>
+	<iframe id="guestFrame" name="guestFrame" src="http://other-domain.com/"></iframe>
 
 Define an event handler if you want to receive messages.
 
