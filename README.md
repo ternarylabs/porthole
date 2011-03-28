@@ -1,7 +1,6 @@
 Porthole is a small library to enable secure cross-domain iFrame communication.
 
 ## Usage
-
 Include the javascript.
 
 	<script type="text/javascript" src="porthole.js"></script>
@@ -29,7 +28,26 @@ Create a window proxy object.
 		// Register an event handler to receive messages;
 		windowProxy.addEventListener(onMessage);
 	};
-	
-## Demo
 
+Create a window proxy object in the iFrame.
+
+	var windowProxy;
+	window.onload=function(){ 
+		// Create a proxy window to send to and receive message from the parent
+		windowProxy = new Porthole.WindowProxy('http://parent-domain.com/proxy.html');
+
+		// Register an event handler to receive messages;
+		windowProxy.addEventListener(function(event) { 
+			// handle event
+		});
+	};
+
+Send a message.
+
+	windowProxy.postMessage('supersizeme');	
+
+## Unit Tests
+	rake jasmine
+
+## Demo
 <http://sandbox.ternarylabs.com/porthole/>
