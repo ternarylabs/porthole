@@ -243,7 +243,8 @@ Porthole.WindowProxyDispatcher = {
 						return w[i];
 					}
 				} catch(e) {
-					error("Can't access object: " + i);
+					// Don't log scary messages
+					//trace("Can't access object: " + i);
 				}
 			}
 		}
