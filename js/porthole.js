@@ -176,7 +176,7 @@ Porthole.WindowProxyDispatcher = {
 		Forward a message event to the target window
 */
 	forwardMessageEvent: function(e) {
-		trace("Porthole.WindowProxyDispatcher.forwardMessageEvent");
+		//trace("Porthole.WindowProxyDispatcher.forwardMessageEvent");
 		var message = document.location.hash;
 		if (message.length > 0) {
 			// Eat the hash character
@@ -230,7 +230,7 @@ Porthole.WindowProxyDispatcher = {
 		Look for a window proxy object in the target window
 */
 	findWindowProxyObjectInWindow: function(w, sourceWindowName) {
-		trace("Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow");
+		//trace("Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow");
 		// IE does not enumerate global objects on the window object
 		if (w.RuntimeObject) {
 			w = w.RuntimeObject();
@@ -239,12 +239,11 @@ Porthole.WindowProxyDispatcher = {
 			for (var i in w) { 
 				try {
 					// Ensure that we're finding the proxy object that is declared to be targetting the window that is calling us
-					if (w[i] != null && typeof(w[i]) == "object" && w[i].getTargetWindowName() == sourceWindowName) { 
+					if (w[i] != null && typeof w[i] == "object" && w[i] instanceof w.Porthole.WindowProxy && w[i].getTargetWindowName() == sourceWindowName) { 
 						return w[i];
 					}
 				} catch(e) {
-					// Don't log scary messages
-					//trace("Can't access object: " + i);
+					// Swallow exception in case we access an object we shouldn't
 				}
 			}
 		}
