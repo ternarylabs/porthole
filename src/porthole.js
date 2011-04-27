@@ -73,7 +73,7 @@ function error(s) {
  */
 Porthole.WindowProxy = function(){}
 
-Porthole.WindowProxy.prototype = function(){
+Porthole.WindowProxy.prototype = {
 /**
  * Post a message to the target window only if the content comes from the target origin.
  * <code>targetOrigin</code> can be a url or *
@@ -81,7 +81,7 @@ Porthole.WindowProxy.prototype = function(){
  * @param {String} data
  * @param {String} targetOrigin
  */
-	postMessage : function(){}
+	postMessage : function() {},
 /**
  * Add an event listener to receive messages.
  * @public
@@ -94,7 +94,7 @@ Porthole.WindowProxy.prototype = function(){
  * @public
  * @param {Function} eventListenerCallback
  */
-	removeEventListener: function(f) {},
+	removeEventListener: function(f) {}
 }
 
 /**

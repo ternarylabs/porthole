@@ -1,4 +1,4 @@
-Porthole is a small library to enable secure cross-domain iFrame communication.
+Porthole is a small library for secure cross-domain iFrame communication.
 
 ## Usage
 Include the javascript.
@@ -51,3 +51,6 @@ Send a message.
 
 ## Demo
 <http://sandbox.ternarylabs.com/porthole/>
+
+## Documentation
+<http://ternarylabs.github.com/porthole/>

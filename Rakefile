@@ -2,7 +2,7 @@ require 'jasmine'
 load 'jasmine/tasks/jasmine.rake'
 
 def porthole_sources
-  sources = ["js/porthole.js"]
+  sources = ["src/porthole.js"]
   sources
 end
 
@@ -20,4 +20,20 @@ task :doc do
     t[:out] = 'pages/jsdoc'
   end
   Rake::Task[:lambda_jsdoc].invoke
+end
+
+namespace :example do
+  
+desc "Build example"
+task :build do
+  FileUtils.mkdir_p 'example/sandbox.ternarylabs.com/porthole/js'
+  FileUtils.cp_r porthole_sources, 'example/sandbox.ternarylabs.com/porthole/js'
+end
+
+desc "Publish example"
+task :publish => :build do
+  system("rsync -avz --delete 'example/sandbox.ternarylabs.com/porthole' 'ternarylabs.com:sandbox.ternarylabs.com/'")
+  system("rsync -avz --delete 'example/demo.auberger.com/porthole' 'auberger.com:demo.auberger.com/'")
+end
+
 end
