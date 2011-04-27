@@ -3,17 +3,27 @@ describe("WindowProxyDispatcher", function() {
   });
 
   it("should start", function() {
-		spyOn(window, 'addEventListener');
+		if (window.addEventListener) {
+			spyOn(window, 'addEventListener');
+		} else {
+			spyOn(window, 'attachEvent');
+		}
 		Porthole.WindowProxyDispatcher.start();
-    expect(window.addEventListener).toHaveBeenCalled();
+		if (window.addEventListener) {
+    	expect(window.addEventListener).toHaveBeenCalled();
+		} else {
+    	expect(window.attachEvent).toHaveBeenCalled();
+		}
   });
 
   it("should find window proxy object", function() {
-		unauthorized = new Porthole.WindowProxy('', '');
+		unauthorized = new Porthole.WindowProxyLegacy('', '');
 		spyOn(unauthorized, 'getTargetWindowName').andThrow("unauthorized access");
-		wrongWindowProxy = new Porthole.WindowProxy('', 'SomeOtherWindow');
-		targetWindowProxy = new Porthole.WindowProxy('', 'SourceWindowName');
-		o = Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow([ unauthorized, wrongWindowProxy, targetWindowProxy ], 'SourceWindowName');
+		wrongWindowProxy = new Porthole.WindowProxyLegacy('', 'SomeOtherWindow');
+		targetWindowProxy = new Porthole.WindowProxyLegacy('', 'SourceWindowName');
+		fakeWindowObject = [ unauthorized, wrongWindowProxy, targetWindowProxy ];
+		fakeWindowObject.Porthole = { 'WindowProxy' : Porthole.WindowProxyLegacy};
+		o = Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow(fakeWindowObject, 'SourceWindowName');
     expect(o).toEqual(targetWindowProxy);
   });
 

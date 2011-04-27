@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      Porthole: Small Javascript Library for Secure Cross Domain iFrame Communication
+    </title>
+    <meta name='keywords' content='ternary labs, tlabs, iframe, cross domain, javascript' />
+    <meta name='description' content='Porthole: Small Javascript Library for Secure Cross Domain iFrame Communication.' />
+    <meta name="author" content="Georges Auberger" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.0.0/build/cssreset/reset-min.css" />
+    <link rel="stylesheet" href="http://cdn.ternarylabs.com/css/fonts.min.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="http://cdn.ternarylabs.com/css/default.min.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="http://cdn.ternarylabs.com/css/syntax.min.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="http://cdn.ternarylabs.com/css/print.min.css" type="text/css" media="print" />
+    <style type="text/css">
+    body {
+      background: none;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="site">
+      <div id="post">
+        <h1>
+          Porthole<br />
+        <span style="font-size:0.6em;">
+          JavaScript Library for Secure Cross Domain iFrame Communication
+        </span>
+        </h1>
+        <div id="content">
+          <p>
+            <img src="http://cdn.ternarylabs.com/media/2011/03/porthole_210x209.jpg" width="210" height="209" class="left" />
+          </p>
+          <p>
+            <a href="https://github.com/ternarylabs/porthole/">Porthole</a> is a small Javascript library that makes it safe and easy to communicate with cross domain iFrames.
+          </p>
+          <p>
+            Porthole relies on hidden iFrames (later referred to a as proxy) to exchange information. The caller sets a url fragment with the message to pass. The proxy by virtue of being served from the same origin as the callee, invokes a callback method with an event object that contains the message read from the url fragment. The message signaling mechanism is based on a resize event.
+          </p>
+          <p>
+            Learn more about <a href="http://ternarylabs.com/2011/03/27/secure-cross-domain-iframe-communication/">Porthole</a>.
+          </p>
+          <h2>
+            Usage
+          </h2>
+          <p>
+            Include the Javascript.
+          </p>
+          <div class="highlight">
+            <pre>
+<code class="html"><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">src=</span><span class="s">"porthole.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code>
+</pre>
+          </div>
+          <p>
+            Create your content iFrame. This is where the guest content lives. Make sure to give it a name.
+          </p>
+          <div class="highlight">
+            <pre>
+<code class="html"><span class="nt">&lt;iframe</span> <span class="na">id=</span><span class="s">"guestFrame"</span> <span class="na">name=</span><span class="s">"guestFrame"</span> <span class="na">src=</span><span class="s">"http://other-domain.com/"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/iframe&gt;</span>
+</code>
+</pre>
+          </div>
+          <p>
+            Define an event handler if you want to receive messages.
+          </p>
+          <div class="highlight">
+            <pre>
+<code class="js"><span class="kd">function</span> <span class="nx">onMessage</span><span class="p">(</span><span class="nx">messageEvent</span><span class="p">)</span> <span class="p">{</span>  
+    <span class="cm">/*</span>
+<span class="cm">   messageEvent.origin: Protocol and domain origin of the message</span>
+<span class="cm">   messageEvent.data: Message itself</span>
+<span class="cm">   messageEvent.source: Window proxy object, useful to post a response </span>
+<span class="cm">   */</span>
+<span class="p">}</span>
+</code>
+</pre>
+          </div>
+          <p>
+            Create a window proxy object on the main page.
+          </p>
+          <div class="highlight">
+            <pre>
+<code class="js"><span class="kd">var</span> <span class="nx">windowProxy</span><span class="p">;</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">onload</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span> 
+    <span class="c1">// Create a proxy window to send to and receive </span>
+    <span class="c1">// messages from the iFrame</span>
+    <span class="nx">windowProxy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Porthole</span><span class="p">.</span><span class="nx">WindowProxy</span><span class="p">(</span>
+        <span class="s1">'http://other-domain.com/proxy.html'</span><span class="p">,</span> <span class="s1">'guestFrame'</span><span class="p">);</span>
+
+    <span class="c1">// Register an event handler to receive messages;</span>
+    <span class="nx">windowProxy</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="nx">onMessage</span><span class="p">);</span>
+<span class="p">};</span>
+</code>
+</pre>
+          </div>
+          <p>
+            Create a window proxy object in the iFrame.
+          </p>
+          <div class="highlight">
+            <pre>
+<code class="js"><span class="kd">var</span> <span class="nx">windowProxy</span><span class="p">;</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">onload</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span> 
+    <span class="c1">// Create a proxy window to send to and receive </span>
+    <span class="c1">// messages from the parent</span>
+    <span class="nx">windowProxy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Porthole</span><span class="p">.</span><span class="nx">WindowProxy</span><span class="p">(</span>
+        <span class="s1">'http://parent-domain.com/proxy.html'</span><span class="p">);</span>
+
+    <span class="c1">// Register an event handler to receive messages;</span>
+    <span class="nx">windowProxy</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span> 
+        <span class="c1">// handle event</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+</code>
+</pre>
+          </div>
+          <p>
+            Send a message.
+          </p>
+          <div class="highlight">
+            <pre>
+<code class="js"><span class="nx">windowProxy</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">(</span><span class="s1">'supersizeme'</span><span class="p">);</span>
+</code>
+</pre>
+          </div>
+          <p>
+            Note that if you have multiple iFrames, you can create as many WindowProxy objects as needed.
+          </p>
+          <h2>
+            Compatibility
+          </h2>
+          <p>
+            The library has been tested with IE 7-8, Safari 5, Firefox 3.6 and Google Chrome 6.0
+          </p>
+          <h2>
+            Demo
+          </h2>
+          <p>
+            See it in action at <a href="http://sandbox.ternarylabs.com/porthole/">http://sandbox.ternarylabs.com/porthole/</a>
+          </p>
+          <h2>
+            Source
+          </h2>
+          <p>
+            Download or fork from Github: <a href="https://github.com/ternarylabs/porthole/">https://github.com/ternarylabs/porthole/</a>
+          </p>
+        </div>
+        <div style="margin-top:25px">
+          <p>Brought to you by
+      <a href="http://ternarylabs.com"><img src="http://cdn.ternarylabs.com/images/ternary-labs-logo.png" style="vertical-align:middle;"></a>
+    </p>
+      </div>
+    </div>
+    <div id="footer">
+      <p class="copyright">
+        © 2011 <a href="http://ternarylabs.com">Ternary Labs</a>
+      </p>
+    </div>
+  </body>
+</html>

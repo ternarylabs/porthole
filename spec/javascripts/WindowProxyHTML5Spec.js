@@ -1,30 +1,33 @@
-describe("WindowProxy", function() {
-  var windowProxy;
+if (typeof window.postMessage == 'function') {
+
+describe("WindowProxyHTML5", function() {
+  var windowProxyHTML5;
 
   beforeEach(function() {
-    windowProxy = new Porthole.WindowProxy('http://localhost/proxy.html');
+    windowProxyHTML5 = new Porthole.WindowProxyHTML5();
   });
 
   it("should add an event listener", function() {
 		var listener = jasmine.createSpy();
-    expect(windowProxy.addEventListener(listener)).toBe(listener);
+    expect(windowProxyHTML5.addEventListener(listener)).toBe(listener);
   });
 
   it("should remove an event listener", function() {
 		var listener = jasmine.createSpy();
-    windowProxy.addEventListener(listener);
-    windowProxy.removeEventListener(listener);
+    windowProxyHTML5.addEventListener(listener);
+    windowProxyHTML5.removeEventListener(listener);
   });
 
   it("should call an event listener", function() {
 		var verifyEvent = function(e) {
 			expect(e.data).toEqual('event');
 			expect(e.origin).toEqual('origin');
+			expect(e.source).toEqual(window);
 		}
 		var listener = jasmine.createSpy('listener').andCallFake(verifyEvent);
-    windowProxy.addEventListener(listener);
+    windowProxyHTML5.addEventListener(listener);
 		var e = new Porthole.MessageEvent('event', 'origin', null);
-    windowProxy.dispatchEvent(e);
+    windowProxyHTML5.dispatchEvent(e);
     expect(listener).toHaveBeenCalled();
   });
 
@@ -47,3 +50,5 @@ describe("WindowProxy", function() {
 	});
 
 });
+
+}
