@@ -62,7 +62,7 @@ namespace :example do
 desc "Build example"
 task :build => 'minifier:minify' do
   FileUtils.mkdir_p 'example/sandbox.ternarylabs.com/porthole/js'
-  FileUtils.cp_r porthole_sources, 'example/sandbox.ternarylabs.com/porthole/js'
+  FileUtils.cp_r Dir.glob('src/**/*.js'), 'example/sandbox.ternarylabs.com/porthole/js'
 end
 
 desc "Publish example"
