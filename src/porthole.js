@@ -48,22 +48,23 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
  */
 var Porthole = (typeof Porthole == "undefined") || !Porthole ? {} : Porthole;
 
-/**
- * Utility function to output to console
- * @private
- */
-function trace(s) {
-  try { console.log("Porthole: " + s) } catch (e) { }
-};
+Porthole = {
+	/**
+	 * Utility function to output to console
+	 * @private
+	 */
+	trace: function(s) {
+	  try { console.log("Porthole: " + s) } catch (e) { }
+	},
 
-/**
- * Utility function to output to console
- * @private
- */
-function error(s) {
-  try { console.error("Porthole: " + s) } catch (e) { }
-};
-
+	/**
+	 * Utility function to output to console
+	 * @private
+	 */
+	error: function(s) {
+	  try { console.error("Porthole: " + s) } catch (e) { }
+	}
+}
 /**
  * Proxy window object to post message to target window
  *
@@ -163,7 +164,7 @@ Porthole.WindowProxyLegacy.prototype = {
 			targetOrigin = '*';
 		}
 		if (this.proxyIFrameElement == null) {
-			error("Can't send message because no proxy url was passed in the constructor");
+			Porthole.error("Can't send message because no proxy url was passed in the constructor");
 		} else {
 			sourceWindowName = window.name;
 			this.proxyIFrameElement.setAttribute('src', this.proxyIFrameLocation + '#' + data +
@@ -186,7 +187,7 @@ Porthole.WindowProxyLegacy.prototype = {
 			this.eventListeners.splice(index, 1);
 		} catch(e) {
 			this.eventListeners = [];
-			error(e);
+			Porthole.error(e);
 		}
 	},
 
@@ -195,7 +196,7 @@ Porthole.WindowProxyLegacy.prototype = {
 			try {
 	    	this.eventListeners[i](e);
 			} catch(ex) {
-				error("Exception trying to call back listener: " + ex);
+				Porthole.error("Exception trying to call back listener: " + ex);
 			}
 	  }
 	}
@@ -240,11 +241,11 @@ Porthole.WindowProxyHTML5.prototype = {
 }
 
 if (typeof window.postMessage != 'function') {
-	trace("Using legacy browser support");
+	Porthole.trace("Using legacy browser support");
 	Porthole.WindowProxy = Porthole.WindowProxyLegacy;
 	Porthole.WindowProxy.prototype = Porthole.WindowProxyLegacy.prototype;
 } else {
-	trace("Using legacy browser support");
+	Porthole.trace("Using built-in browser support");
 	Porthole.WindowProxy = Porthole.WindowProxyHTML5;
 	Porthole.WindowProxy.prototype = Porthole.WindowProxyHTML5.prototype;
 }
@@ -296,7 +297,6 @@ Porthole.WindowProxyDispatcher = {
 		* @private
 		*/
 	forwardMessageEvent: function(e) {
-		//trace("Porthole.WindowProxyDispatcher.forwardMessageEvent");
 		var message = document.location.hash;
 		if (message.length > 0) {
 			// Eat the hash character
@@ -317,10 +317,10 @@ Porthole.WindowProxyDispatcher = {
 					e = new Porthole.MessageEvent(m.data, m.sourceOrigin, windowProxy);
 					windowProxy.dispatchEvent(e);
 				} else {
-					error("Target origin " + windowProxy.origin + " does not match desired target of " + m.targetOrigin);
+					Porthole.error("Target origin " + windowProxy.origin + " does not match desired target of " + m.targetOrigin);
 				}
 			} else {
-				error("Could not find window proxy object on the target window");
+				Porthole.error("Could not find window proxy object on the target window");
 			}
 		}
 	},
@@ -351,7 +351,6 @@ Porthole.WindowProxyDispatcher = {
 		* @private
 		*/
 	findWindowProxyObjectInWindow: function(w, sourceWindowName) {
-		//trace("Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow");
 		// IE does not enumerate global objects on the window object
 		if (w.RuntimeObject) {
 			w = w.RuntimeObject();
@@ -382,7 +381,7 @@ Porthole.WindowProxyDispatcher = {
 			window.attachEvent('onresize', Porthole.WindowProxyDispatcher.forwardMessageEvent);
 		} else {
 			// Should never happen
-			error("Can't attach resize event");
+			Porthole.error("Can't attach resize event");
 		}
 	}
 };
