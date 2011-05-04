@@ -65,6 +65,8 @@ namespace :example do
   task :build => 'minifier:minify' do
     FileUtils.mkdir_p 'example/sandbox.ternarylabs.com/porthole/js'
     FileUtils.cp_r Dir.glob('src/**/*.js'), 'example/sandbox.ternarylabs.com/porthole/js'
+    FileUtils.mkdir_p 'example/abc.com/js'
+    FileUtils.cp_r Dir.glob('src/**/*.js'), 'example/abc.com/js'
   end
 
   desc "Publish example"
