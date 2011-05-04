@@ -54,7 +54,7 @@ Porthole = {
 	 * @private
 	 */
 	trace: function(s) {
-	  try { console.log("Porthole: " + s) } catch (e) { }
+	  try { console.log("Porthole: " + s); } catch (e) { }
 	},
 
 	/**
@@ -62,9 +62,9 @@ Porthole = {
 	 * @private
 	 */
 	error: function(s) {
-	  try { console.error("Porthole: " + s) } catch (e) { }
+	  try { console.error("Porthole: " + s); } catch (e) { }
 	}
-}
+};
 /**
  * Proxy window object to post message to target window
  *
@@ -72,7 +72,7 @@ Porthole = {
  * @param proxyIFrameUrl
  * @param targetWindowName
  */
-Porthole.WindowProxy = function(){}
+Porthole.WindowProxy = function(){};
 
 Porthole.WindowProxy.prototype = {
 /**
@@ -96,7 +96,7 @@ Porthole.WindowProxy.prototype = {
  * @param {Function} eventListenerCallback
  */
 	removeEventListener: function(f) {}
-}
+};
 
 /**
  * Legacy browser implementation of proxy window object to post message to target window
@@ -107,14 +107,14 @@ Porthole.WindowProxy.prototype = {
  * @param targetWindowName
  */
 Porthole.WindowProxyLegacy = function(proxyIFrameUrl, targetWindowName) {
-	if (targetWindowName == null) {
+	if (targetWindowName === null) {
 		targetWindowName = '';
 	}
 	this.targetWindowName = targetWindowName;
 
 	this.eventListeners = [];
-	this.origin = window.location.protocol + '//' + window.location.host
-	if (proxyIFrameUrl != null) {	
+	this.origin = window.location.protocol + '//' + window.location.host;
+	if (proxyIFrameUrl !== null) {	
 		this.proxyIFrameName = this.targetWindowName + 'ProxyIFrame';
 		this.proxyIFrameLocation = proxyIFrameUrl;
 
@@ -124,7 +124,7 @@ Porthole.WindowProxyLegacy = function(proxyIFrameUrl, targetWindowName) {
 		// Won't be able to send messages
 		this.proxyIFrameElement = null;
 	}
-}
+};
 
 Porthole.WindowProxyLegacy.prototype = {
 	getTargetWindowName: function() {
@@ -160,10 +160,10 @@ Porthole.WindowProxyLegacy.prototype = {
 	},
 	
 	postMessage: function(data, targetOrigin) {
-		if (targetOrigin == null) {
+		if (targetOrigin === null) {
 			targetOrigin = '*';
 		}
-		if (this.proxyIFrameElement == null) {
+		if (this.proxyIFrameElement === null) {
 			Porthole.error("Can't send message because no proxy url was passed in the constructor");
 		} else {
 			sourceWindowName = window.name;
@@ -194,7 +194,7 @@ Porthole.WindowProxyLegacy.prototype = {
 	dispatchEvent: function(e) {
 		for (var i = 0; i < this.eventListeners.length; i++) {
 			try {
-	    	this.eventListeners[i](e);
+				this.eventListeners[i](e);
 			} catch(ex) {
 				Porthole.error("Exception trying to call back listener: " + ex);
 			}
@@ -206,20 +206,20 @@ Porthole.WindowProxyLegacy.prototype = {
 	* Implementation for modern browsers that supports it
 	*/
 Porthole.WindowProxyHTML5 = function(proxyIFrameUrl, targetWindowName) {
-	if (targetWindowName == null) {
+	if (targetWindowName === null) {
 		targetWindowName = '';
 	}
 	this.targetWindowName = targetWindowName;
-}
+};
 
 Porthole.WindowProxyHTML5.prototype = {
 	postMessage: function(data, targetOrigin) {
-		if (targetOrigin == null) {
+		if (targetOrigin === null) {
 			targetOrigin = '*';
 		}
 		
 		// Lookup window object from target window name
-		if (this.targetWindowName == '') {
+		if (this.targetWindowName === '') {
 			targetWindow = top;
 		} else {
 			targetWindow = parent.frames[this.targetWindowName];
@@ -238,7 +238,7 @@ Porthole.WindowProxyHTML5.prototype = {
 		evt.initMessageEvent("message", true, true, e.data, e.origin, 1, window, null);
 		window.dispatchEvent(evt);
 	}
-}
+};
 
 if (typeof window.postMessage != 'function') {
 	Porthole.trace("Using legacy browser support");
@@ -258,13 +258,13 @@ if (typeof window.postMessage != 'function') {
 	* @returns {Array} key value pair array
 	*/
 Porthole.WindowProxy.splitMessageParameters = function(message) {
-	if (typeof message == 'undefined' || message == null) {
+	if (typeof message == 'undefined' || message === null) {
 		return null;
 	}
-	var hash = new Array();
+	var hash = [];
 	var pairs = message.split(/&/);
 	for (var keyValuePairIndex in pairs) {
-		var nameValue = pairs[keyValuePairIndex].split(/=/);
+		var nameValue = pairs[keyValuePairIndex].split('=');
 		if (typeof(nameValue[1]) == 'undefined') {
 			hash[nameValue[0]] = '';
 		} else {
@@ -272,7 +272,7 @@ Porthole.WindowProxy.splitMessageParameters = function(message) {
 		}
 	}
 	return hash;
-}
+};
 
 /**
 	* Event object to be passed to registered event handlers
@@ -284,7 +284,7 @@ Porthole.MessageEvent = function MessageEvent(data, origin, source) {
 	this.data = data;
 	this.origin = origin;
 	this.source = source;
-}
+};
 
 /**
 	* Dispatcher object to relay messages.
@@ -304,7 +304,7 @@ Porthole.WindowProxyDispatcher = {
 		
 			m = Porthole.WindowProxyDispatcher.parseMessage(message);
 
-			if (m.targetWindowName == '') {
+			if (m.targetWindowName === '') {
 				targetWindow = top;
 			} else {
 				targetWindow = parent.frames[m.targetWindowName];
@@ -326,15 +326,15 @@ Porthole.WindowProxyDispatcher = {
 	},
 
 	parseMessage: function(message) {
-		if (typeof message == 'undefined' || message == null) {
+		if (typeof message == 'undefined' || message === null) {
 			return null;
 		}
 		params = Porthole.WindowProxy.splitMessageParameters(message);
 		var h = {targetOrigin:'', sourceOrigin:'', sourceWindowName:'', data:''};
-		h.targetOrigin = unescape(params['targetOrigin']);
-		h.sourceOrigin = unescape(params['sourceOrigin']);
-		h.sourceWindowName = unescape(params['sourceWindowName']);
-		h.targetWindowName = unescape(params['targetWindowName']);
+		h.targetOrigin = unescape(params.targetOrigin);
+		h.sourceOrigin = unescape(params.sourceOrigin);
+		h.sourceWindowName = unescape(params.sourceWindowName);
+		h.targetWindowName = unescape(params.targetWindowName);
 		var d = message.split(/&/);
 		if (d.length > 3) {
 			d.pop();
@@ -359,7 +359,8 @@ Porthole.WindowProxyDispatcher = {
 			for (var i in w) { 
 				try {
 					// Ensure that we're finding the proxy object that is declared to be targetting the window that is calling us
-					if (w[i] != null && typeof w[i] == "object" && w[i] instanceof w.Porthole.WindowProxy && w[i].getTargetWindowName() == sourceWindowName) { 
+					if (w[i] !== null && typeof w[i] == "object" && w[i] instanceof w.Porthole.WindowProxy && 
+								w[i].getTargetWindowName() == sourceWindowName) { 
 						return w[i];
 					}
 				} catch(e) {

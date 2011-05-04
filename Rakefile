@@ -1,6 +1,8 @@
 require 'jasmine'
 load 'jasmine/tasks/jasmine.rake'
-
+require 'jslint/tasks'
+JSLint.config_path = "config/jslint.yml"
+ 
 def porthole_sources
   sources = ["src/porthole.js"]
   sources
@@ -59,15 +61,15 @@ namespace :minifier do
 end
 
 namespace :example do  
-desc "Build example"
-task :build => 'minifier:minify' do
-  FileUtils.mkdir_p 'example/sandbox.ternarylabs.com/porthole/js'
-  FileUtils.cp_r Dir.glob('src/**/*.js'), 'example/sandbox.ternarylabs.com/porthole/js'
-end
+  desc "Build example"
+  task :build => 'minifier:minify' do
+    FileUtils.mkdir_p 'example/sandbox.ternarylabs.com/porthole/js'
+    FileUtils.cp_r Dir.glob('src/**/*.js'), 'example/sandbox.ternarylabs.com/porthole/js'
+  end
 
-desc "Publish example"
-task :publish => :build do
-  system("rsync -avz --delete 'example/sandbox.ternarylabs.com/porthole' 'ternarylabs.com:sandbox.ternarylabs.com/'")
-  system("rsync -avz --delete 'example/demo.auberger.com/porthole' 'auberger.com:demo.auberger.com/'")
-end
+  desc "Publish example"
+  task :publish => :build do
+    system("rsync -avz --delete 'example/sandbox.ternarylabs.com/porthole' 'ternarylabs.com:sandbox.ternarylabs.com/'")
+    system("rsync -avz --delete 'example/demo.auberger.com/porthole' 'auberger.com:demo.auberger.com/'")
+  end
 end
