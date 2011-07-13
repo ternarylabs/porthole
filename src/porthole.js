@@ -114,7 +114,7 @@ Porthole.WindowProxyLegacy = function(proxyIFrameUrl, targetWindowName) {
 
 	this.eventListeners = [];
 	this.origin = window.location.protocol + '//' + window.location.host;
-	if (proxyIFrameUrl !== null) {	
+	if (proxyIFrameUrl !== null) {
 		this.proxyIFrameName = this.targetWindowName + 'ProxyIFrame';
 		this.proxyIFrameLocation = proxyIFrameUrl;
 
@@ -130,11 +130,11 @@ Porthole.WindowProxyLegacy.prototype = {
 	getTargetWindowName: function() {
 		return this.targetWindowName;
 	},
-	
+
 	getOrigin: function() {
 		return this.origin;
 	},
-	
+
 	/**
 	 * Create an iframe and load the proxy
 	 *
@@ -158,7 +158,7 @@ Porthole.WindowProxyLegacy.prototype = {
 		document.body.appendChild(iframe);
 		return iframe;
 	},
-	
+
 	postMessage: function(data, targetOrigin) {
 		if (targetOrigin === undefined) {
 			targetOrigin = '*';
@@ -168,9 +168,9 @@ Porthole.WindowProxyLegacy.prototype = {
 		} else {
 			sourceWindowName = window.name;
 			this.proxyIFrameElement.setAttribute('src', this.proxyIFrameLocation + '#' + data +
-				'&sourceOrigin=' + escape(this.getOrigin()) + 
-				'&targetOrigin=' + escape(targetOrigin) + 
-				'&sourceWindowName=' + sourceWindowName + 
+				'&sourceOrigin=' + escape(this.getOrigin()) +
+				'&targetOrigin=' + escape(targetOrigin) +
+				'&sourceWindowName=' + sourceWindowName +
 				'&targetWindowName=' + this.targetWindowName);
 			this.proxyIFrameElement.height = this.proxyIFrameElement.height > 50 ? 50 : 100;
 		}
@@ -217,7 +217,7 @@ Porthole.WindowProxyHTML5.prototype = {
 		if (targetOrigin === undefined) {
 			targetOrigin = '*';
 		}
-		
+
 		// Lookup window object from target window name
 		if (this.targetWindowName === '') {
 			targetWindow = top;
@@ -264,12 +264,14 @@ Porthole.WindowProxy.splitMessageParameters = function(message) {
 	var hash = [];
 	var pairs = message.split(/&/);
 	for (var keyValuePairIndex in pairs) {
-		var nameValue = pairs[keyValuePairIndex].split('=');
-		if (typeof(nameValue[1]) == 'undefined') {
-			hash[nameValue[0]] = '';
-		} else {
-			hash[nameValue[0]] = nameValue[1];
-		}
+        if (pairs.hasOwnProperty(keyValuePairIndex)) {
+		    var nameValue = pairs[keyValuePairIndex].split('=');
+		    if (typeof(nameValue[1]) == 'undefined') {
+			    hash[nameValue[0]] = '';
+		    } else {
+			    hash[nameValue[0]] = nameValue[1];
+		    }
+        }
 	}
 	return hash;
 };
@@ -301,7 +303,7 @@ Porthole.WindowProxyDispatcher = {
 		if (message.length > 0) {
 			// Eat the hash character
 			message = message.substr(1);
-		
+
 			m = Porthole.WindowProxyDispatcher.parseMessage(message);
 
 			if (m.targetWindowName === '') {
@@ -309,7 +311,7 @@ Porthole.WindowProxyDispatcher = {
 			} else {
 				targetWindow = parent.frames[m.targetWindowName];
 			}
-		
+
 			var windowProxy = Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow(targetWindow, m.sourceWindowName);
 
 			if (windowProxy) {
@@ -345,7 +347,7 @@ Porthole.WindowProxyDispatcher = {
 		}
 		return h;
 	},
-	
+
 	/**
 		* Look for a window proxy object in the target window
 		* @private
@@ -356,11 +358,11 @@ Porthole.WindowProxyDispatcher = {
 			w = w.RuntimeObject();
 		}
 		if (w) {
-			for (var i in w) { 
+			for (var i in w) {
 				try {
 					// Ensure that we're finding the proxy object that is declared to be targetting the window that is calling us
-					if (w[i] !== null && typeof w[i] == "object" && w[i] instanceof w.Porthole.WindowProxy && 
-								w[i].getTargetWindowName() == sourceWindowName) { 
+					if (w[i] !== null && typeof w[i] == "object" && w[i] instanceof w.Porthole.WindowProxy &&
+								w[i].getTargetWindowName() == sourceWindowName) {
 						return w[i];
 					}
 				} catch(e) {
@@ -370,14 +372,14 @@ Porthole.WindowProxyDispatcher = {
 		}
 		return null;
 	},
-	
+
 	/**
 	 * Start a proxy to relay messages.
 	 * @public
 	 */
 	start: function() {
 		if (window.addEventListener) {
-			window.addEventListener('resize', Porthole.WindowProxyDispatcher.forwardMessageEvent, false); 
+			window.addEventListener('resize', Porthole.WindowProxyDispatcher.forwardMessageEvent, false);
 		} else if (document.body.attachEvent) {
 			window.attachEvent('onresize', Porthole.WindowProxyDispatcher.forwardMessageEvent);
 		} else {
