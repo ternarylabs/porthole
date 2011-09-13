@@ -261,7 +261,7 @@ Porthole.WindowProxy.splitMessageParameters = function(message) {
 	if (typeof message == 'undefined' || message === null) {
 		return null;
 	}
-	var hash = [];
+	var hash = {};
 	var pairs = message.split(/&/);
 	for (var keyValuePairIndex in pairs) {
         if (pairs.hasOwnProperty(keyValuePairIndex)) {
