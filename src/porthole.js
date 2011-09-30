@@ -249,6 +249,9 @@ if (typeof window.postMessage != 'function') {
 	Porthole.WindowProxy = Porthole.WindowProxyHTML5;
 	Porthole.WindowProxy.prototype = Porthole.WindowProxyHTML5.prototype;
 }
+Porthole.WindowProxy.prototype.post = function(data) {
+    this.postMessage(Porthole.WindowProxy.serialize(data));
+};
 
 /**
 	* Convinience method to split a message of type param=value&param2=value2
