@@ -277,6 +277,57 @@ Porthole.WindowProxy.splitMessageParameters = function(message) {
 };
 
 /**
+ * Serialize an object to a query string.
+ *
+ * @param {Object} obj The object to be serialized
+ * @return {String} Serialization
+ */
+Porthole.WindowProxy.serialize = function(obj, prefix) {
+    var key, new_key, new_value, result = [];
+    for(key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            new_key = prefix ? prefix + '.' + key : key;
+            new_value = obj[key];
+            result.push(typeof new_value == 'object' ?
+                        Porthole.WindowProxy.serialize(new_value, new_key) :
+                        encodeURIComponent(new_key) + '=' + encodeURIComponent(new_value));
+        }
+    }
+    return result.join('&');
+};
+
+/**
+ * Unserialize a query string to an object, where names can use dotted notation.
+ *
+ * @param {String} text Serialization
+ * @return {Object} name-value pairs
+ */
+Porthole.WindowProxy.unserialize =  function(text) {
+    var result = {};
+    var decoded_nameValue;
+	var pairs = text.split('&');
+
+    var dotted = function(obj, dotted_key, val) {
+        obj = obj || {};
+        dotted_key = dotted_key.split('.');
+        var key = dotted_key.shift();
+        obj[key] = dotted_key.length ? dotted(obj[key], dotted_key.join('.'), val) : val;
+        return obj;
+    };
+
+    for (var keyValuePairIndex in pairs) {
+        if (pairs.hasOwnProperty(keyValuePairIndex)) {
+            var nameValue = pairs[keyValuePairIndex].split('=');
+
+            nameValue[1] = nameValue[1] || '';
+            result = dotted(result, nameValue[0], nameValue[1]);
+        }
+	}
+
+    return result;
+};
+
+/**
 	* Event object to be passed to registered event handlers
 	* @param {String} data
 	* @param {String} origin url of window sending the message
