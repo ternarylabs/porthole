@@ -313,7 +313,7 @@ Porthole.WindowProxy.unserialize =  function(text) {
     var dotted = function(obj, dotted_key, val) {
         obj = obj || {};
         dotted_key = dotted_key.split('.');
-        var key = dotted_key.shift();
+        var key = decodeURIComponent(dotted_key.shift());
         obj[key] = dotted_key.length ? dotted(obj[key], dotted_key.join('.'), val) : val;
         return obj;
     };
@@ -322,7 +322,7 @@ Porthole.WindowProxy.unserialize =  function(text) {
         if (pairs.hasOwnProperty(keyValuePairIndex)) {
             var nameValue = pairs[keyValuePairIndex].split('=');
 
-            nameValue[1] = nameValue[1] || '';
+            nameValue[1] = decodeURIComponent(nameValue[1] || '');
             result = dotted(result, nameValue[0], nameValue[1]);
         }
 	}
