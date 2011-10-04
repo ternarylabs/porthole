@@ -289,7 +289,7 @@ Porthole.WindowProxy.serialize = function(obj, prefix) {
     var key, new_key, new_value, result = [];
     obj = obj || {};
     for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
+        if (obj.hasOwnProperty(key) && typeof obj[key] !== 'undefined') {
             new_key = prefix ? prefix + '.' + key : key;
             new_value = obj[key];
             result.push(typeof new_value == 'object' ?
