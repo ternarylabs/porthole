@@ -287,7 +287,8 @@ Porthole.WindowProxy.splitMessageParameters = function(message) {
  */
 Porthole.WindowProxy.serialize = function(obj, prefix) {
     var key, new_key, new_value, result = [];
-    for(key in obj) {
+    obj = obj || {};
+    for (key in obj) {
         if (obj.hasOwnProperty(key)) {
             new_key = prefix ? prefix + '.' + key : key;
             new_value = obj[key];
