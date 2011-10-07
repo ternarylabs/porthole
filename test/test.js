@@ -35,7 +35,7 @@ Object.prototype.equals = function(x, check_type) {
         }
     }
     for (p in x) {
-        if(typeof(this[p]) == 'undefined') {
+        if(typeof(this[p]) == 'undefined' && x[p] !== null) {
             return false;
         }
     }
@@ -65,11 +65,9 @@ var unserialize = Porthole.WindowProxy.unserialize;
 
 ok(typeof serialize === "function", "serialize function defined");
 ok(typeof unserialize === "function", "userialize function defined");
-ok(serialize({abc: 123}) === "abc=123", "serialize abc123");
 
 // Objects
 var obj = {abc: 123, x: { y: 123, zq: "sdfsdf"}};
-ok(serialize(obj) === "abc=123&x.y=123&x.zq=sdfsdf", "serialize obj");
 var obj2 = unserialize(serialize(obj));
 ok(obj.equals(obj2, true), "unserialize serialized obj equals (with type check) obj");
 ok(obj.equals(obj2, false), "unserialize serialized obj equals (no type check) obj");
@@ -83,8 +81,7 @@ ok(typeof obj2.length == "undefined", "obj2 should not have .length property");
 // Arrays
 var arr = [{abc: 123, x: { y: 123, zq: "sdfsdf"}}, 2312, "adfas", {x: ["a", "b", [1,2,3]]}];
 arr[323] = "asdfasdf";
-var arr2 = unserialize(serialize(obj));
-console.log(arr, arr2, typeof arr, typeof arr2);
+var arr2 = unserialize(serialize(arr));
 ok(arr.equals(arr2), "unserialize serialized arr equals arr");
 ok(typeof arr == typeof arr2, "unserialize serialized arr has same type as arr");
 ok(arr.length == arr2.length, "arrays should have same length");
