@@ -48,6 +48,9 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
  */
 var Porthole = (typeof Porthole == "undefined") || !Porthole ? {} : Porthole;
 
+// Support testing some code in node.js:
+var window = (typeof window == "undefined") ? this : window;
+
 Porthole = {
 	/**
 	 * Utility function to output to console
@@ -443,3 +446,8 @@ Porthole.WindowProxyDispatcher = {
 		}
 	}
 };
+
+// Support testing in node.js:
+if (typeof exports != "undefined") {
+    exports.Porthole = Porthole;
+}
