@@ -48,6 +48,9 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
  */
 var Porthole = (typeof Porthole == "undefined") || !Porthole ? {} : Porthole;
 
+// Support testing some code in node.js:
+var window = (typeof window == "undefined") ? this : window;
+
 Porthole = {
 	/**
 	 * Utility function to output to console
@@ -282,55 +285,31 @@ Porthole.WindowProxy.splitMessageParameters = function(message) {
 };
 
 /**
- * Serialize an object to a query string.
+ * Serialize an object using JSON.stringify
  *
  * @param {Object} obj The object to be serialized
- * @return {String} Serialization
+ * @return {String}
  */
-Porthole.WindowProxy.serialize = function(obj, prefix) {
-    var key, new_key, new_value, result = [];
-    obj = obj || {};
-    for (key in obj) {
-        if (obj.hasOwnProperty(key) && typeof obj[key] !== 'undefined') {
-            new_key = prefix ? prefix + '.' + key : key;
-            new_value = obj[key];
-            result.push(typeof new_value == 'object' ?
-                        Porthole.WindowProxy.serialize(new_value, new_key) :
-                        encodeURIComponent(new_key) + '=' + encodeURIComponent(new_value));
-        }
+Porthole.WindowProxy.serialize = function(obj) {
+    if (typeof JSON === 'undefined') {
+        throw new Error('Porthole serialization depends on JSON!');
     }
-    return result.join('&');
+
+    return JSON.stringify(obj);
 };
 
 /**
- * Unserialize a query string to an object, where names can use dotted notation.
+ * Unserialize using JSON.parse
  *
  * @param {String} text Serialization
- * @return {Object} name-value pairs
+ * @return {Object}
  */
 Porthole.WindowProxy.unserialize =  function(text) {
-    var result = {};
-    var decoded_nameValue;
-	var pairs = text.split('&');
+    if (typeof JSON === 'undefined') {
+        throw new Error('Porthole unserialization dependens on JSON!');
+    }
 
-    var dotted = function(obj, dotted_key, val) {
-        obj = obj || {};
-        dotted_key = dotted_key.split('.');
-        var key = decodeURIComponent(dotted_key.shift());
-        obj[key] = dotted_key.length ? dotted(obj[key], dotted_key.join('.'), val) : val;
-        return obj;
-    };
-
-    for (var keyValuePairIndex in pairs) {
-        if (pairs.hasOwnProperty(keyValuePairIndex)) {
-            var nameValue = pairs[keyValuePairIndex].split('=');
-
-            nameValue[1] = decodeURIComponent(nameValue[1] || '');
-            result = dotted(result, nameValue[0], nameValue[1]);
-        }
-	}
-
-    return result;
+    return JSON.parse(text);
 };
 
 /**
@@ -449,3 +428,8 @@ Porthole.WindowProxyDispatcher = {
 		}
 	}
 };
+
+// Support testing in node.js:
+if (typeof exports != "undefined") {
+    exports.Porthole = Porthole;
+}
