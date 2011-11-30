@@ -221,6 +221,8 @@ Porthole.WindowProxyHTML5.prototype = {
 		// Lookup window object from target window name
 		if (this.targetWindowName === '') {
 			targetWindow = top;
+		} else if (this.targetWindowName === 'top' || this.targetWindowName === 'parent') {
+			targetWindow = window[this.targetWindowName];
 		} else {
 			targetWindow = parent.frames[this.targetWindowName];
 		}
@@ -363,6 +365,8 @@ Porthole.WindowProxyDispatcher = {
 
 			if (m.targetWindowName === '') {
 				targetWindow = top;
+			} else if (m.targetWindowName === 'top' || m.targetWindowName === 'parent') {
+				targetWindow = window[m.targetWindowName];
 			} else {
 				targetWindow = parent.frames[m.targetWindowName];
 			}
@@ -414,14 +418,16 @@ Porthole.WindowProxyDispatcher = {
 		}
 		if (w) {
 			for (var i in w) {
-				try {
-					// Ensure that we're finding the proxy object that is declared to be targetting the window that is calling us
-					if (w[i] !== null && typeof w[i] == "object" && w[i] instanceof w.Porthole.WindowProxy &&
-								w[i].getTargetWindowName() == sourceWindowName) {
-						return w[i];
+				if (w.hasOwnProperty(i)) {
+					try {
+						// Ensure that we're finding the proxy object that is declared to be targetting the window that is calling us
+						if (w[i] !== null && typeof w[i] == "object" && w[i] instanceof w.Porthole.WindowProxy &&
+									w[i].getTargetWindowName() == sourceWindowName) {
+							return w[i];
+						}
+					} catch(e) {
+						// Swallow exception in case we access an object we shouldn't
 					}
-				} catch(e) {
-					// Swallow exception in case we access an object we shouldn't
 				}
 			}
 		}
