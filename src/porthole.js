@@ -202,11 +202,12 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
 
         dispatchEvent: function(e) {
             for (var i = 0; i < this.eventListeners.length; i++) {
-                try {
+                // FIXME Removed this for Johan, but not sure if this is the right fix
+                //try {
                     this.eventListeners[i](e);
-                } catch(ex) {
-                    Porthole.error('Exception trying to call back listener: ' + ex);
-                }
+                //} catch(ex) {
+                //    Porthole.error('Exception trying to call back listener: ' + ex);
+                //}
             }
         }
     };
