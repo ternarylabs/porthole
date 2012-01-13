@@ -43,13 +43,13 @@ note right of "iFrame proxy abc.com": read url fragment
 iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
 */
 
+(function (window) {
+    'use strict';
+
 /**
  * Namespace for Porthole, a small library for secure cross-domain iFrame communication.
  */
-var Porthole = (typeof Porthole == "undefined") || !Porthole ? {} : Porthole;
-
-// Support testing some code in node.js:
-var window = (typeof window == "undefined") ? this : window;
+var Porthole = (typeof Porthole === "undefined" || !Porthole) ? {} : Porthole;
 
 Porthole = {
 	/**
@@ -433,3 +433,5 @@ Porthole.WindowProxyDispatcher = {
 if (typeof exports != "undefined") {
     exports.Porthole = Porthole;
 }
+
+})(this);
