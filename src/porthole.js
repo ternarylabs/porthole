@@ -149,6 +149,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
          */
         createIFrameProxy: function() {
             var iframe = document.createElement('iframe');
+
             iframe.setAttribute('id', this.proxyIFrameName);
             iframe.setAttribute('name', this.proxyIFrameName);
             iframe.setAttribute('src', this.proxyIFrameLocation);
@@ -168,18 +169,21 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         },
 
         postMessage: function(data, targetOrigin) {
+            var sourceWindowName,
+                src;
+
             if (targetOrigin === undefined) {
                 targetOrigin = '*';
             }
             if (this.proxyIFrameElement === null) {
                 Porthole.error('Cannot send message because no proxy url was passed in the constructor');
             } else {
-                var sourceWindowName = window.name,
-                    src = (this.proxyIFrameLocation + '#' + data +
-                           '&sourceOrigin=' + window.encodeURIComponent(this.getOrigin()) +
-                           '&targetOrigin=' + window.encodeURIComponent(targetOrigin) +
-                           '&sourceWindowName=' + sourceWindowName +
-                           '&targetWindowName=' + this.targetWindowName);
+                sourceWindowName = window.name;
+                src = (this.proxyIFrameLocation + '#' + data +
+                       '&sourceOrigin=' + window.encodeURIComponent(this.getOrigin()) +
+                       '&targetOrigin=' + window.encodeURIComponent(targetOrigin) +
+                       '&sourceWindowName=' + sourceWindowName +
+                       '&targetWindowName=' + this.targetWindowName);
                 this.proxyIFrameElement.setAttribute('src', src);
                 this.proxyIFrameElement.height = this.proxyIFrameElement.height > 50 ? 50 : 100;
             }
@@ -191,8 +195,10 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         },
 
         removeEventListener: function(f) {
+            var index;
+
             try {
-                var index = this.eventListeners.indexOf(f);
+                index = this.eventListeners.indexOf(f);
                 this.eventListeners.splice(index, 1);
             } catch(e) {
                 this.eventListeners = [];
@@ -201,7 +207,9 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         },
 
         dispatchEvent: function(e) {
-            for (var i = 0; i < this.eventListeners.length; i++) {
+            var i;
+
+            for (i = 0; i < this.eventListeners.length; i++) {
                 // FIXME Removed this for Johan, but not sure if this is the right fix
                 //try {
                     this.eventListeners[i](e);
@@ -257,7 +265,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         }
     };
 
-    if (typeof window.postMessage != 'function') {
+    if (typeof window.postMessage !== 'function') {
         Porthole.trace('Using legacy browser support');
         Porthole.WindowProxy = Porthole.WindowProxyLegacy;
         Porthole.WindowProxy.prototype = Porthole.WindowProxyLegacy.prototype;
@@ -285,6 +293,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             pairs = message.split(/&/),
             keyValuePairIndex,
             nameValue;
+
         for (keyValuePairIndex in pairs) {
             if (pairs.hasOwnProperty(keyValuePairIndex)) {
                 nameValue = pairs[keyValuePairIndex].split('=');
@@ -353,6 +362,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                 m,
                 targetWindow,
                 windowProxy;
+
             if (message.length > 0) {
                 // Eat the hash character
                 message = message.substr(1);
@@ -418,12 +428,14 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
          * @private
          */
         findWindowProxyObjectInWindow: function(w, sourceWindowName) {
+            var i;
+
             // IE does not enumerate global objects on the window object
             if (w.RuntimeObject) {
                 w = w.RuntimeObject();
             }
             if (w) {
-                for (var i in w) {
+                for (i in w) {
                     if (w.hasOwnProperty(i)) {
                         try {
                             // Ensure that we're finding the proxy object
@@ -464,5 +476,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
     // Support testing in node.js:
     if (typeof window.exports !== 'undefined') {
         window.exports.Porthole = Porthole;
+    } else {
+        window.Porthole = Porthole;
     }
 })(this);
