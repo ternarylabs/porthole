@@ -156,7 +156,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             // IE needs this otherwise resize event is not fired
             iframe.setAttribute('frameBorder', '1');
             iframe.setAttribute('scrolling', 'auto');
-            // Need a certain size othwerise IE7 does not fire resize event
+            // Need a certain size otherwise IE7 does not fire resize event
             iframe.setAttribute('width', 30);
             iframe.setAttribute('height', 30);
             iframe.setAttribute('style', 'position: absolute; left: -100px; top:0px;');
@@ -170,20 +170,22 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
 
         postMessage: function(data, targetOrigin) {
             var sourceWindowName,
-                src;
+                src,
+                encode = window.encodeURIComponent;
 
             if (targetOrigin === undefined) {
                 targetOrigin = '*';
             }
             if (this.proxyIFrameElement === null) {
-                Porthole.error('Cannot send message because no proxy url was passed in the constructor');
+                Porthole.error('Cannot send message because no proxy url' +
+                               ' was passed in the constructor');
             } else {
                 sourceWindowName = window.name;
-                src = (this.proxyIFrameLocation + '#' + data +
-                       '&sourceOrigin=' + window.encodeURIComponent(this.getOrigin()) +
-                       '&targetOrigin=' + window.encodeURIComponent(targetOrigin) +
-                       '&sourceWindowName=' + sourceWindowName +
-                       '&targetWindowName=' + this.targetWindowName);
+                src = (this.proxyIFrameLocation + '#data=' + encode(data) +
+                       '&sourceOrigin=' + encode(this.getOrigin()) +
+                       '&targetOrigin=' + encode(targetOrigin) +
+                       '&sourceWindowName=' + encode(sourceWindowName) +
+                       '&targetWindowName=' + encode(this.targetWindowName));
                 this.proxyIFrameElement.setAttribute('src', src);
                 this.proxyIFrameElement.height = this.proxyIFrameElement.height > 50 ? 50 : 100;
             }
@@ -213,7 +215,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                 try {
                     this.eventListeners[i](e);
                 } catch(ex) {
-                    Porthole.error('Exception trying to call back listener: ' + ex);
+                    // Porthole.error('Exception trying to call back listener: ' + ex);
                 }
             }
         }
@@ -406,19 +408,18 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                 return null;
             }
             params = Porthole.WindowProxy.splitMessageParameters(message);
-            h = {targetOrigin:'', sourceOrigin:'', sourceWindowName:'', data:''};
-            h.targetOrigin = decode(params.targetOrigin);
+            h = {
+                data:'',
+                sourceOrigin:'',
+                targetOrigin:'',
+                sourceWindowName:'',
+                targetWindowName:''
+            };
+            h.data = decode(params.data);
             h.sourceOrigin = decode(params.sourceOrigin);
-            h.sourceWindowName = decode(params.sourceWindowName);
+            h.targetOrigin = decode(params.targetOrigin);
             h.targetWindowName = decode(params.targetWindowName);
-            d = message.split(/&/);
-            if (d.length > 3) {
-                d.pop();
-                d.pop();
-                d.pop();
-                d.pop();
-                h.data = d.join('&');
-            }
+            h.sourceWindowName = decode(params.sourceWindowName);
             return h;
         },
 
