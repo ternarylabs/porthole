@@ -275,8 +275,8 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         Porthole.WindowProxy = Porthole.WindowProxyHTML5;
         Porthole.WindowProxy.prototype = Porthole.WindowProxyHTML5.prototype;
     }
-    Porthole.WindowProxy.prototype.post = function(data) {
-        this.postMessage(Porthole.WindowProxy.serialize(data));
+    Porthole.WindowProxy.prototype.post = function(data, targetOrigin) {
+        this.postMessage(Porthole.WindowProxy.serialize(data), targetOrigin);
     };
 
     /**
