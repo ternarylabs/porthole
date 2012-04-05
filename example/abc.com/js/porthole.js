@@ -103,7 +103,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
          */
         removeEventListener: function(f) {}
     };
-
+    
     /**
      * Legacy browser implementation of proxy window object to post message to target window
      *
@@ -169,8 +169,8 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         },
 
         postMessage: function(data, targetOrigin) {
-            var sourceWindowName,
-                src,
+            var src,
+                message,
                 encode = window.encodeURIComponent;
 
             if (targetOrigin === undefined) {
@@ -180,12 +180,14 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                 Porthole.error('Cannot send message because no proxy url' +
                                ' was passed in the constructor');
             } else {
-                sourceWindowName = window.name;
-                src = (this.proxyIFrameLocation + '#data=' + encode(data) +
-                       '&sourceOrigin=' + encode(this.getOrigin()) +
-                       '&targetOrigin=' + encode(targetOrigin) +
-                       '&sourceWindowName=' + encode(sourceWindowName) +
-                       '&targetWindowName=' + encode(this.targetWindowName));
+                message = {
+                    'data' : data,
+                    'sourceOrigin' : this.getOrigin(),
+                    'targetOrigin' : targetOrigin,
+                    'sourceWindowName' : window.name,
+                    'targetWindowName' : this.targetWindowName
+                }
+                src = this.proxyIFrameLocation + '#' + encode(Porthole.WindowProxy.serialize(message));
                 this.proxyIFrameElement.setAttribute('src', src);
                 this.proxyIFrameElement.height = this.proxyIFrameElement.height > 50 ? 50 : 100;
             }
@@ -208,12 +210,15 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             }
         },
 
-        dispatchEvent: function(e) {
-            var i;
+        dispatchEvent: function(message) {
+            var i,
+                event;
+
+            event = new Porthole.MessageEvent(message.data, message.sourceOrigin, self);
 
             for (i = 0; i < this.eventListeners.length; i++) {
                 try {
-                    this.eventListeners[i](e);
+                    this.eventListeners[i](event);
                 } catch(ex) {
                     // Porthole.error('Exception trying to call back listener: ' + ex);
                 }
@@ -229,44 +234,100 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             targetWindowName = '';
         }
         this.targetWindowName = targetWindowName;
+        this.eventListeners = [];
+        this.eventListenerCallback = null;
     };
 
     Porthole.WindowProxyHTML5.prototype = {
         postMessage: function(data, targetOrigin) {
-            var targetWindow;
+            var message;
 
             if (targetOrigin === undefined) {
                 targetOrigin = '*';
             }
 
-            // Lookup window object from target window name
-            if (this.targetWindowName === '') {
-                targetWindow = top;
-            } else if (this.targetWindowName === 'top' || this.targetWindowName === 'parent') {
-                targetWindow = window[this.targetWindowName];
-            } else {
-                targetWindow = parent.frames[this.targetWindowName];
+            message = {
+                'data' : data,
+                'sourceOrigin' : this.getOrigin(),
+                'targetOrigin' : targetOrigin,
+                'sourceWindowName' : window.name,
+                'targetWindowName' : this.targetWindowName
             }
-            targetWindow.postMessage(data, targetOrigin);
+
+            this.getTargetWindow().postMessage(data, targetOrigin);
+        },
+
+        /**
+         * Lookup window object based on target window name
+         * @private
+         * @return targetWindow
+         */
+        getTargetWindow: function() {
+            if (this.targetWindowName === '') {
+                return top;
+            } else if (this.targetWindowName === 'top' || this.targetWindowName === 'parent') {
+                return window[this.targetWindowName];
+            } 
+            return parent.frames[this.targetWindowName];
         },
 
         addEventListener: function(f) {
-            window.addEventListener('message', f, false);
+            if (this.eventListeners.length == 0) {
+                var self = this;
+                this.eventListenerCallback = function(event) { self.eventListener(self, event); };
+                window.addEventListener('message', this.eventListenerCallback, false);
+            }
+            this.eventListeners.push(f);
             return f;
         },
 
         removeEventListener: function(f) {
-            window.removeEventListener('message', f, false);
+            var index;
+
+            try {
+                index = this.eventListeners.indexOf(f);
+                this.eventListeners.splice(index, 1);
+            } catch(e) {
+                this.eventListeners = [];
+                Porthole.error(e);
+            }
+            if (this.eventListeners.length == 0) {
+                window.removeEventListener('message', this.eventListenerCallback);
+                this.eventListenerCallback = null;
+            }
         },
 
+        dispatchEvent: function(originalEvent, message) {
+            var i,
+                event;
+
+            event = new Porthole.MessageEvent(message.data, originalEvent.sourceOrigin, self);
+
+            for (i = 0; i < this.eventListeners.length; i++) {
+                try {
+                    this.eventListeners[i](event);
+                } catch(ex) {
+                    Porthole.error('Exception trying to call back listener: ' + ex);
+                }
+            }
+        },
+
+        eventListener: function(self, event) {
+            if (event.data && event.data.sourceWindowName == self.targetWindowName) {
+                self.dispatchEvent(event.data);
+            }
+        }
+
+/*
         dispatchEvent: function(e) {
             var evt = document.createEvent('MessageEvent');
             evt.initMessageEvent('message', true, true, e.data, e.origin, 1, window, null);
             window.dispatchEvent(evt);
         }
+*/
     };
 
-    if (typeof window.postMessage !== 'function') {
+    if (typeof window.postMessage == 'function') {
         Porthole.trace('Using legacy browser support');
         Porthole.WindowProxy = Porthole.WindowProxyLegacy;
         Porthole.WindowProxy.prototype = Porthole.WindowProxyLegacy.prototype;
@@ -277,35 +338,6 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
     }
     Porthole.WindowProxy.prototype.post = function(data, targetOrigin) {
         this.postMessage(Porthole.WindowProxy.serialize(data), targetOrigin);
-    };
-
-    /**
-     * Convinience method to split a message of type param=value&param2=value2
-     * and return an array such as ['param':value, 'param2':value2]
-     *
-     * @param {String} message
-     * @returns {Array} key value pair array
-     */
-    Porthole.WindowProxy.splitMessageParameters = function(message) {
-        if (typeof message === 'undefined' || message === null) {
-            return null;
-        }
-        var hash = {},
-            pairs = message.split(/&/),
-            keyValuePairIndex,
-            nameValue;
-
-        for (keyValuePairIndex in pairs) {
-            if (pairs.hasOwnProperty(keyValuePairIndex)) {
-                nameValue = pairs[keyValuePairIndex].split('=');
-                if (typeof(nameValue[1]) === 'undefined') {
-                    hash[nameValue[0]] = '';
-                } else {
-                    hash[nameValue[0]] = nameValue[1];
-                }
-            }
-        }
-        return hash;
     };
 
     /**
@@ -332,7 +364,6 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         if (typeof JSON === 'undefined') {
             throw new Error('Porthole unserialization dependens on JSON!');
         }
-
         return JSON.parse(text);
     };
 
@@ -359,68 +390,42 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
          * @private
          */
         forwardMessageEvent: function(e) {
-            var message = document.location.hash,
-                m,
+            var message,
+                decode = window.decodeURIComponent,
                 targetWindow,
                 windowProxy;
 
-            if (message.length > 0) {
+            if (document.location.hash.length > 0) {
                 // Eat the hash character
-                message = message.substr(1);
+                message = Porthole.WindowProxy.unserialize(decode(document.location.hash.substr(1)));
 
-                m = Porthole.WindowProxyDispatcher.parseMessage(message);
-
-                if (m.targetWindowName === '') {
+                if (message.targetWindowName === '') {
                     targetWindow = top;
-                } else if (m.targetWindowName === 'top' || m.targetWindowName === 'parent') {
-                    targetWindow = window[m.targetWindowName];
+                } else if (message.targetWindowName === 'top' || message.targetWindowName === 'parent') {
+                    targetWindow = window[message.targetWindowName];
                 } else {
-                    targetWindow = parent.frames[m.targetWindowName];
+                    targetWindow = parent.frames[message.targetWindowName];
                 }
 
                 windowProxy =
                     Porthole.WindowProxyDispatcher.findWindowProxyObjectInWindow(
                         targetWindow,
-                        m.sourceWindowName
+                        message.sourceWindowName
                     );
 
                 if (windowProxy) {
-                    if (windowProxy.origin === m.targetOrigin || m.targetOrigin === '*') {
-                        e = new Porthole.MessageEvent(m.data, m.sourceOrigin, windowProxy);
-                        windowProxy.dispatchEvent(e);
+                    if (windowProxy.origin === message.targetOrigin || message.targetOrigin === '*') {
+                        windowProxy.dispatchEvent(message);
                     } else {
                         Porthole.error('Target origin ' +
                                        windowProxy.origin +
                                        ' does not match desired target of ' +
-                                       m.targetOrigin);
+                                       message.targetOrigin);
                     }
                 } else {
                     Porthole.error('Could not find window proxy object on the target window');
                 }
             }
-        },
-
-        parseMessage: function(message) {
-            var params, h, d,
-                decode = window.decodeURIComponent;
-
-            if (typeof message === 'undefined' || message === null) {
-                return null;
-            }
-            params = Porthole.WindowProxy.splitMessageParameters(message);
-            h = {
-                data:'',
-                sourceOrigin:'',
-                targetOrigin:'',
-                sourceWindowName:'',
-                targetWindowName:''
-            };
-            h.data = decode(params.data);
-            h.sourceOrigin = decode(params.sourceOrigin);
-            h.targetOrigin = decode(params.targetOrigin);
-            h.targetWindowName = decode(params.targetWindowName);
-            h.sourceWindowName = decode(params.sourceWindowName);
-            return h;
         },
 
         /**
