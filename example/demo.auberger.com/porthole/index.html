@@ -6,9 +6,8 @@
 		<script type="text/javascript" src="http://sandbox.ternarylabs.com/porthole/js/porthole.min.js"></script>
 		<script type="text/javascript">
 			function onMessage(messageEvent) {
-				var parameters = Porthole.WindowProxy.splitMessageParameters(messageEvent.data);
-				if (parameters["color"]) {
-					document.body.bgColor = parameters["color"];
+				if (messageEvent.data["color"]) {
+					document.body.bgColor = messageEvent.data["color"];
 				}
 			}
 			var windowProxy;
@@ -26,10 +25,10 @@
 			Click a button to communicate with the parent frame.
 		</p>
 		<div>
-			<input onclick="windowProxy.postMessage('color=blue');" type="submit" value="Color Parent Blue"/>
-			<input onclick="windowProxy.postMessage('color=green');" type="submit" value="Color Parent Green"/>
-			<input onclick="windowProxy.postMessage('expand');" type="submit" value="Expand Me"/>
-			<input onclick="windowProxy.postMessage('collapse');" type="submit" value="Shrink Me"/>
+			<input onclick="windowProxy.post({'color':'blue'});" type="submit" value="Color Parent Blue"/>
+			<input onclick="windowProxy.post({'color':'green'});" type="submit" value="Color Parent Green"/>
+			<input onclick="windowProxy.post({'expanded':true});" type="submit" value="Expand Me"/>
+			<input onclick="windowProxy.post({'expanded':false});" type="submit" value="Shrink Me"/>
 		</div>
 	</body>
 </html>

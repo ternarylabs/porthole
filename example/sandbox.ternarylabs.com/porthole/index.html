@@ -8,15 +8,13 @@
 			
 			function onMessage1(messageEvent) {  
 				if (messageEvent.origin == "http://" + guestDomain) {
-					var parameters = Porthole.WindowProxy.splitMessageParameters(messageEvent.data);
-					if (parameters["color"]) {
-						document.body.bgColor = parameters["color"];
+					if (messageEvent.data["color"]) {
+						document.body.bgColor = messageEvent.data["color"];
 					}
-					if ("expand" in parameters) {
+					if (messageEvent.data["expanded"]) {
 						el = document.getElementById('guestFrame1');
 						el.setAttribute('height', "250px");
-					}
-					if ("collapse" in parameters) {
+					} else {
 						el = document.getElementById('guestFrame1');
 						el.setAttribute('height', "150px");
 					}
@@ -29,15 +27,13 @@
 			*/
 			function onMessage2(messageEvent) { 
 				if (messageEvent.origin == "http://" + guestDomain) {
-					var parameters = Porthole.WindowProxy.splitMessageParameters(messageEvent.data);
-					if (parameters["color"]) {
-						document.body.bgColor = parameters["color"];
+					if (messageEvent.data["color"]) {
+						document.body.bgColor = messageEvent.data["color"];
 					}
-					if ("expand" in parameters) {
+					if (messageEvent.data["expanded"]) {
 						el = document.getElementById('guestFrame2');
 						el.setAttribute('width', "600px");
-					}
-					if ("collapse" in parameters) {
+					} else {
 						el = document.getElementById('guestFrame2');
 						el.setAttribute('width', "500px");
 					}
@@ -47,11 +43,11 @@
 			var windowProxy1, windowProxy2;
 			window.onload=function(){ 
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy1 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole/proxy.html', 'guestFrame1');
+					windowProxy1 = new Porthole.WindowProxy('http://' + guestDomain + '/proxy.html', 'guestFrame1');
 					windowProxy1.addEventListener(onMessage1);
 
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy2 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole/proxy.html', 'guestFrame2');
+					windowProxy2 = new Porthole.WindowProxy('http://' + guestDomain + '/proxy.html', 'guestFrame2');
 					windowProxy2.addEventListener(onMessage2);
 			};
 		</script>
@@ -64,8 +60,8 @@
 			Click a button to communicate with the child frames.
 		</p>
 		<div>
-			<input onclick="windowProxy1.postMessage('color=red')" type="submit" value="Color Frame1 Red" /> 
-			<input onclick="windowProxy2.postMessage('color=yellow')" type="submit" value="Color Frame2 Yellow" />
+			<input onclick="windowProxy1.post({'color':'red'})" type="submit" value="Color Frame1 Red" /> 
+			<input onclick="windowProxy2.post({'color':'yellow'})" type="submit" value="Color Frame2 Yellow" />
 		</div>
 		<div>
 			<h3>Frame 1</h3>

@@ -48,10 +48,9 @@ function() {
 	function() {
 		spyOn(windowProxyLegacy, 'getOrigin').andReturn('http://test.server');
 		spyOn(windowProxyLegacy.proxyIFrameElement, 'setAttribute');
-		windowProxyLegacy.postMessage('message');
+		windowProxyLegacy.post('message');
 		expect(windowProxyLegacy.proxyIFrameElement.setAttribute).toHaveBeenCalledWith('src',
-		'http://localhost/proxy.html#message&sourceOrigin=http%3A//test.server&targetOrigin=*&sourceWindowName=' + 
-			window.name + '&targetWindowName=');
+		'http://localhost/proxy.html#%7B%22data%22%3A%22message%22%2C%22sourceOrigin%22%3A%22http%3A%2F%2Ftest.server%22%2C%22targetOrigin%22%3A%22*%22%2C%22sourceWindowName%22%3A%22%22%2C%22targetWindowName%22%3A%22%22%7D');
 		expect(windowProxyLegacy.proxyIFrameElement.height).toEqual('100');
 	});
 

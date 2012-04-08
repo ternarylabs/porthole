@@ -32,34 +32,56 @@ function() {
 		expect(listener).toHaveBeenCalled();
 	});
 
-	it("should split no message",
-	function() {
-		expect(Porthole.WindowProxy.splitMessageParameters()).toEqual(null);
-	});
-
-	it("should split null message",
-	function() {
-		expect(Porthole.WindowProxy.splitMessageParameters(null)).toEqual(null);
-	});
-
-	it("should split an empty message",
-	function() {
-		expect(Porthole.WindowProxy.splitMessageParameters('').length).toEqual(0);
-	});
-
-	it("should split a valid message",
-	function() {
-		expect(Porthole.WindowProxy.splitMessageParameters("param=value")).toEqual({
-			'param': 'value'
+	describe(".serialize",
+	function(){
+		it("should serialize a string",
+		function(){
+			var aString = "Some random string";
+			expect(Porthole.WindowProxy.serialize(aString)).toEqual('"Some random string"');
 		});
-		expect(Porthole.WindowProxy.splitMessageParameters("foo=1&bar=2")).toEqual({
-			'foo': '1',
-			'bar': '2'
+
+		it("should serialize a an array",
+		function(){
+			var anArray = [1,2,3];
+			expect(Porthole.WindowProxy.serialize(anArray)).toEqual('[1,2,3]');
 		});
-		expect(Porthole.WindowProxy.splitMessageParameters("foo=1&bar")).toEqual({
-			'foo': '1',
-			'bar': ''
+
+		it("should serialize a hash",
+		function(){
+			var aHash = { 'key' : 'value' };
+			expect(Porthole.WindowProxy.serialize(aHash)).toEqual('{"key":"value"}');
+		});
+
+		it("should serialize an object",
+		function(){
+			var anObject = {abc: 123, x: { y: 123, z: "string"}};
+			expect(Porthole.WindowProxy.serialize(anObject)).toEqual('{"abc":123,"x":{"y":123,"z":"string"}}');
 		});
 	});
+
+	describe(".unserialize",
+	function(){
+		it("should deserialize a string",
+		function(){
+			expect(Porthole.WindowProxy.unserialize('"A string"')).toEqual("A string");
+		});
+
+		it("should deserialize a an array",
+		function(){
+			expect(Porthole.WindowProxy.unserialize('[1,2,3]')).toEqual([1,2,3]);
+		});
+
+		it("should deserialize a hash",
+		function(){
+			expect(Porthole.WindowProxy.unserialize('{"key":"value"}')).toEqual({ 'key' : 'value' });
+		});
+
+		it("should deserialize an object",
+		function(){
+			expect(Porthole.WindowProxy.unserialize('{"abc":123,"x":{"y":123,"z":"string"}}')).toEqual({abc: 123, x: { y: 123, z: "string"}});
+		});
+
+	});
+
 
 });

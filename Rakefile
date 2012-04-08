@@ -11,17 +11,10 @@ end
 desc "Build documentation"
 task :doc do
   puts 'Creating Documentation'
-  require 'rubygems'
-  require 'jsdoc_helper'
-
-  FileUtils.rm_r "pages/jsdoc", :force => true
-
-  JsdocHelper::Rake::Task.new(:lambda_jsdoc) do |t|
-    t[:files] = porthole_sources
-    t[:options] = ''
-    t[:out] = 'pages/jsdoc'
-  end
-  Rake::Task[:lambda_jsdoc].invoke
+  FileUtils.rm_r "jsdoc", :force => true
+  # Requires jsdoc3
+  system('../../jsdoc/jsdoc -c ./config/jsdoc.conf.json -d jsdoc -r src')
+  FileUtils.cp "jsdoc/module-Porthole.html", "jsdoc/index.html"
 end
 
 namespace :minifier do
@@ -56,7 +49,7 @@ namespace :minifier do
 
   desc "minify javascript"
   task :minify_js do
-    minify(FileList['src/**/*.js'])
+    minify(FileList['src/porthole.js'])
   end
 end
 

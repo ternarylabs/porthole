@@ -7,8 +7,8 @@
 			var guestDomain = 'xyz.com';
 			
 			function onMessage1(messageEvent) {  
-				console.log("onMessage1");
-				if (messageEvent.origin == "http://" + guestDomain) {
+				Porthole.trace("onMessage1");
+				if (messageEvent.origin == "https://" + guestDomain) {
 					if (messageEvent.data["color"]) {
 						document.body.bgColor = messageEvent.data["color"];
 					}
@@ -27,8 +27,8 @@
 				messages for instance.
 			*/
 			function onMessage2(messageEvent) { 
-				console.log("onMessage2");
-				if (messageEvent.origin == "http://" + guestDomain) {
+				Porthole.trace("onMessage2");
+				if (messageEvent.origin == "https://" + guestDomain) {
 					if (messageEvent.data["color"]) {
 						document.body.bgColor = messageEvent.data["color"];
 					}
@@ -44,12 +44,13 @@
 			
 			var windowProxy1, windowProxy2;
 			window.onload=function(){ 
+				Porthole.trace("onload");
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy1 = new Porthole.WindowProxy('http://' + guestDomain + '/proxy.html', 'guestFrame1');
+					windowProxy1 = new Porthole.WindowProxy('https://' + guestDomain + '/proxy.html', 'guestFrame1');
 					windowProxy1.addEventListener(onMessage1);
 
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy2 = new Porthole.WindowProxy('http://' + guestDomain + '/proxy.html', 'guestFrame2');
+					windowProxy2 = new Porthole.WindowProxy('https://' + guestDomain + '/proxy.html', 'guestFrame2');
 					windowProxy2.addEventListener(onMessage2);
 			};
 		</script>
@@ -62,16 +63,16 @@
 			Click a button to communicate with the child frames.
 		</p>
 		<div>
-			<input onclick="windowProxy1.postMessage({'color':'red'})" type="submit" value="Color Frame1 Red" /> 
-			<input onclick="windowProxy2.postMessage({'color':'yellow'})" type="submit" value="Color Frame2 Yellow" />
+			<input onclick="windowProxy1.post({'color':'red'})" type="submit" value="Color Frame1 Red" /> 
+			<input onclick="windowProxy2.post({'color':'yellow'})" type="submit" value="Color Frame2 Yellow" />
 		</div>
 		<div>
 			<h3>Frame 1</h3>
-			<iframe id="guestFrame1" name="guestFrame1" width="500px" height="150px" frameborder="1" src="http://xyz.com/" scrolling="no"></iframe>
+			<iframe id="guestFrame1" name="guestFrame1" width="500px" height="150px" frameborder="1" src="https://xyz.com/" scrolling="no"></iframe>
 		</div>
 		<div>
 			<h3>Frame 2</h3>
-			<iframe id="guestFrame2" name="guestFrame2" width="500px" height="150px" frameborder="1" src="http://xyz.com/" scrolling="no"></iframe>
+			<iframe id="guestFrame2" name="guestFrame2" width="500px" height="150px" frameborder="1" src="https://xyz.com/" scrolling="no"></iframe>
 		</div>
 	</body>
 </html>
