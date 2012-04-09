@@ -367,7 +367,12 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         if (typeof JSON === 'undefined') {
             throw new Error('Porthole unserialization dependens on JSON!');
         }
-        return JSON.parse(text);
+        try {
+            var json = JSON.parse(text);
+        } catch (e) {
+            return false;
+        }
+        return json;
     };
 
     Porthole.WindowProxy.getTargetWindow = function(targetWindowName) {
