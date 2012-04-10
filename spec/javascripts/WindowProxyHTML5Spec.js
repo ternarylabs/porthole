@@ -39,6 +39,15 @@ if (typeof window.postMessage == 'function') {
             window.dispatchEvent(evt);
 			expect(listener).toHaveBeenCalled();
 		});
-	});
 
+		it("should ignore calles from other sources",
+		function() {
+			var listener = jasmine.createSpy('listener')
+			windowProxyHTML5.addEventListener(listener);
+			var evt = document.createEvent('MessageEvent');
+            evt.initMessageEvent('message', true, true, {}, '', 1, window, null);
+            window.dispatchEvent(evt);
+			expect(listener).not.toHaveBeenCalled();
+		});
+	});
 }
