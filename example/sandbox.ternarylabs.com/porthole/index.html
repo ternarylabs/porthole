@@ -43,11 +43,11 @@
 			var windowProxy1, windowProxy2;
 			window.onload=function(){ 
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy1 = new Porthole.WindowProxy('http://' + guestDomain + '/proxy.html', 'guestFrame1');
+					windowProxy1 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole/proxy.html', 'guestFrame1');
 					windowProxy1.addEventListener(onMessage1);
 
 					// Create a proxy window to send to and receive message from the guest iframe
-					windowProxy2 = new Porthole.WindowProxy('http://' + guestDomain + '/proxy.html', 'guestFrame2');
+					windowProxy2 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole/proxy.html', 'guestFrame2');
 					windowProxy2.addEventListener(onMessage2);
 			};
 		</script>

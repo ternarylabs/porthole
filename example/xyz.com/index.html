@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Porthole Guest Content</title>
-		<script type="text/javascript" src="https://abc.com/js/porthole.js"></script>
+		<script type="text/javascript" src="http://abc.com/js/porthole.js"></script>
 		<script type="text/javascript">
 			function onMessage(messageEvent) {
 				if (messageEvent.data["color"]) {
@@ -12,7 +12,7 @@
 			}
 			var windowProxy;
 			window.onload=function(){ 
-				windowProxy = new Porthole.WindowProxy("https://abc.com/proxy.html"); 
+				windowProxy = new Porthole.WindowProxy("http://abc.com/proxy.html"); 
 				windowProxy.addEventListener(onMessage);
 			}
 		</script>
