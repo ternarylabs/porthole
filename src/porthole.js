@@ -335,12 +335,12 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         }
     });
 
-    if (typeof window.postMessage !== 'function') {
-        Porthole.trace('Using legacy browser support');
-        Porthole.WindowProxy = Porthole.WindowProxyLegacy.extend({});
-    } else {
+    if (!!window.postMessage) {
         Porthole.trace('Using built-in browser support');
         Porthole.WindowProxy = Porthole.WindowProxyHTML5.extend({});
+    } else {
+        Porthole.trace('Using legacy browser support');
+        Porthole.WindowProxy = Porthole.WindowProxyLegacy.extend({});
     }
 
     /**
