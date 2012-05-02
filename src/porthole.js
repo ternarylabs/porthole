@@ -313,7 +313,12 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             if (this.eventListeners.length === 0) {
                 var self = this;
                 this.eventListenerCallback = function(event) { self.eventListener(self, event); };
-                window.addEventListener('message', this.eventListenerCallback, false);
+                if (window.addEventListener) {
+                    window.addEventListener('message', this.eventListenerCallback, false);
+                }
+                else if (window.attachEvent) {
+                    window.attachEvent("onmessage", this.eventListenerCallback);
+                }
             }
             return this._super(f);
         },
@@ -322,7 +327,12 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             this._super(f);
 
             if (this.eventListeners.length === 0) {
-                window.removeEventListener('message', this.eventListenerCallback);
+                if (window.addEventListener) {
+                    window.removeEventListener('message', this.eventListenerCallback);
+                }
+                else if (window.attachEvent) {
+                    window.detachEvent("onmessage", this.eventListenerCallback);
+                }
                 this.eventListenerCallback = null;
             }
         },
@@ -335,7 +345,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         }
     });
 
-    if (typeof window.postMessage !== 'function') {
+    if (typeof window.postMessage === 'undefined') {
         Porthole.trace('Using legacy browser support');
         Porthole.WindowProxy = Porthole.WindowProxyLegacy.extend({});
     } else {
@@ -460,7 +470,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                             // that is declared to be targetting the window that is calling us
                             if (w[i] !== null &&
                                 typeof w[i] === 'object' &&
-                                w[i] instanceof w.Porthole.WindowProxy &&
+                                w[i] instanceof w.window.Porthole.WindowProxy &&
                                 w[i].getTargetWindowName() === sourceWindowName) {
                                 return w[i];
                             }
@@ -482,6 +492,8 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                 window.addEventListener('resize',
                                         Porthole.WindowProxyDispatcher.forwardMessageEvent,
                                         false);
+            } else if (window.attachEvent && window.postMessage !== 'undefined') {
+                window.attachEvent('onresize', Porthole.WindowProxyDispatcher.forwardMessageEvent);
             } else if (document.body.attachEvent) {
                 window.attachEvent('onresize', Porthole.WindowProxyDispatcher.forwardMessageEvent);
             } else {
