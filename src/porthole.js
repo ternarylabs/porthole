@@ -225,10 +225,10 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         dispatchEvent: function(event) {
             var i;
             for (i = 0; i < this.eventListeners.length; i++) {
-                try {
+                //try {
                     this.eventListeners[i](event);
-                } catch(e) {
-                }
+                //} catch(e) {
+                //}
             }
         }
     });
