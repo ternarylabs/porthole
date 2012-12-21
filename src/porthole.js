@@ -238,7 +238,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
      *
      * @private
      * @constructor
-     * @param {string} proxyIFrameUrl - Fully qualified url to proxy iframe
+     * @param {string} proxyIFrameUrl - Fully qualified url to proxy iframe, or null to create a receiver only window
      * @param {string} targetWindowName - Name of the proxy iframe window
      */
     Porthole.WindowProxyLegacy = Porthole.WindowProxyBase.extend({
@@ -254,7 +254,9 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             } else {
                 // Won't be able to send messages
                 this.proxyIFrameElement = null;
-                throw  new Error("proxyIFrameUrl can't be null");
+                Porthole.trace("proxyIFrameUrl is null, window will be a receiver only");
+                this.post = function(){ throw new Error("Receiver only window");};
+                //throw  new Error("proxyIFrameUrl can't be null");
             }
         },
 
