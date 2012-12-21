@@ -17,7 +17,7 @@ Create your content iFrame. This is where the guest content lives. Make sure to 
 Define an event handler if you want to receive messages.
 
 ```javascript
-function onMessage(messageEvent) {  
+function onMessage(messageEvent) {
     /*
    messageEvent.origin: Protocol and domain origin of the message
    messageEvent.data: Message itself
@@ -41,6 +41,16 @@ window.onload=function(){
 };
 ```
 
+NOTE: In case you do not want to support post messages for legacy browsers, you can specify null
+as the proxy url. In this case, when on legacy browser this will be a receiver only window. E.g.
+
+```javascript
+    // Create a proxy window to send to and receive 
+    // messages from the iFrame, no sending for legacyBrowsers, receiver only window
+    windowProxy = new Porthole.WindowProxy(
+        null, 'guestFrame');
+```
+
 Create a window proxy object in the iFrame.
 
 ```javascript
@@ -57,6 +67,8 @@ window.onload=function(){
     });
 };
 ```
+
+NOTE: See the above note for receiver only windows.
 
 Send a message.
 
