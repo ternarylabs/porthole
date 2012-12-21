@@ -460,7 +460,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                             // that is declared to be targetting the window that is calling us
                             if (w[i] !== null &&
                                 typeof w[i] === 'object' &&
-                                w[i] instanceof w.Porthole.WindowProxy &&
+                                w[i] instanceof w.Porthole.WindowProxyBase &&
                                 w[i].getTargetWindowName() === sourceWindowName) {
                                 return w[i];
                             }
