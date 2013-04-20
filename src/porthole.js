@@ -1,42 +1,77 @@
+/**
+ * JSON fix for IE7
+ */
+{
+    JSON = window.JSON || {};
+
+    // implement JSON.stringify serialization
+    JSON.stringify = JSON.stringify || function (obj) {
+        var t = typeof (obj);
+        if (t != "object" || obj === null) {
+            // simple data type
+            if (t == "string") obj = '"'+obj+'"';
+            return String(obj);
+        }
+        else {
+            // recurse array or object
+            var n, v, json = [], arr = (obj && obj.constructor == Array);
+            for (n in obj) {
+                v = obj[n]; t = typeof(v);
+                if (t == "string") v = '"'+v+'"';
+                else if (t == "object" && v !== null) v = JSON.stringify(v);
+                json.push((arr ? "" : '"' + n + '":') + String(v));
+            }
+            return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+        }
+    };
+
+    // implement JSON.parse de-serialization
+    JSON.parse = JSON.parse || function (str) {
+        if (str === "") str = '""';
+        eval("var p=" + str + ";");
+        return p;
+    };
+}
+
 /*
-    Copyright (c) 2011-2012 Ternary Labs. All Rights Reserved.
+ Copyright (c) 2011-2012 Ternary Labs. All Rights Reserved.
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ */
 
 /*
-# Websequencediagrams.com
-participant abc.com
-participant "iFrame proxy xyz.com"
-participant "iFrame proxy abc.com"
-participant "iFrame xyz.com"
-abc.com->iFrame proxy xyz.com: postMessage(data, targetOrigin)
-note left of "iFrame proxy xyz.com": Set url fragment and change size
-iFrame proxy xyz.com->iFrame proxy xyz.com: onResize Event
-note right of "iFrame proxy xyz.com": read url fragment
-iFrame proxy xyz.com->iFrame xyz.com: forwardMessageEvent(event)
-iFrame xyz.com->iFrame proxy abc.com: postMessage(data, targetOrigin)
-note right of "iFrame proxy abc.com": Set url fragment and change size
-iFrame proxy abc.com->iFrame proxy abc.com: onResize Event
-note right of "iFrame proxy abc.com": read url fragment
-iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
-*/
+ # Websequencediagrams.com
+ participant abc.com
+ participant "iFrame proxy xyz.com"
+ participant "iFrame proxy abc.com"
+ participant "iFrame xyz.com"
+ abc.com->iFrame proxy xyz.com: postMessage(data, targetOrigin)
+ note left of "iFrame proxy xyz.com": Set url fragment and change size
+ iFrame proxy xyz.com->iFrame proxy xyz.com: onResize Event
+ note right of "iFrame proxy xyz.com": read url fragment
+ iFrame proxy xyz.com->iFrame xyz.com: forwardMessageEvent(event)
+ iFrame xyz.com->iFrame proxy abc.com: postMessage(data, targetOrigin)
+ note right of "iFrame proxy abc.com": Set url fragment and change size
+ iFrame proxy abc.com->iFrame proxy abc.com: onResize Event
+ note right of "iFrame proxy abc.com": read url fragment
+ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
+ */
 
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
@@ -44,62 +79,62 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
  */
 // Inspired by base2 and Prototype
 (function(){
-  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
-  // The base Class implementation (does nothing)
-  this.Class = function(){};
-  
-  // Create a new Class that inherits from this class
-  Class.extend = function(prop) {
-    var _super = this.prototype;
-    
-    // Instantiate a base class (but only create the instance,
-    // don't run the init constructor)
-    initializing = true;
-    var prototype = new this();
-    initializing = false;
-    
-    // Copy the properties over onto the new prototype
-    for (var name in prop) {
-      // Check if we're overwriting an existing function
-      prototype[name] = typeof prop[name] == "function" && 
-        typeof _super[name] == "function" && fnTest.test(prop[name]) ?
-        (function(name, fn){
-          return function() {
-            var tmp = this._super;
-            
-            // Add a new ._super() method that is the same method
-            // but on the super-class
-            this._super = _super[name];
-            
-            // The method only need to be bound temporarily, so we
-            // remove it when we're done executing
-            var ret = fn.apply(this, arguments);        
-            this._super = tmp;
-            
-            return ret;
-          };
-        })(name, prop[name]) :
-        prop[name];
-    }
-    
-    // The dummy class constructor
-    function Class() {
-      // All construction is actually done in the init method
-      if ( !initializing && this.init )
-        this.init.apply(this, arguments);
-    }
-    
-    // Populate our constructed prototype object
-    Class.prototype = prototype;
-    
-    // Enforce the constructor to be what we expect
-    Class.prototype.constructor = Class;
+    var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
+    // The base Class implementation (does nothing)
+    this.PortholeClass = function(){};
 
-    // And make this class extendable
-    Class.extend = arguments.callee;
-    
-    return Class;
-  };
+    // Create a new Class that inherits from this class
+    PortholeClass.extend = function(prop) {
+        var _super = this.prototype;
+
+        // Instantiate a base class (but only create the instance,
+        // don't run the init constructor)
+        initializing = true;
+        var prototype = new this();
+        initializing = false;
+
+        // Copy the properties over onto the new prototype
+        for (var name in prop) {
+            // Check if we're overwriting an existing function
+            prototype[name] = typeof prop[name] == "function" &&
+                typeof _super[name] == "function" && fnTest.test(prop[name]) ?
+                (function(name, fn){
+                    return function() {
+                        var tmp = this._super;
+
+                        // Add a new ._super() method that is the same method
+                        // but on the super-class
+                        this._super = _super[name];
+
+                        // The method only need to be bound temporarily, so we
+                        // remove it when we're done executing
+                        var ret = fn.apply(this, arguments);
+                        this._super = tmp;
+
+                        return ret;
+                    };
+                })(name, prop[name]) :
+                prop[name];
+        }
+
+        // The dummy class constructor
+        function Class() {
+            // All construction is actually done in the init method
+            if ( !initializing && this.init )
+                this.init.apply(this, arguments);
+        }
+
+        // Populate our constructed prototype object
+        Class.prototype = prototype;
+
+        // Enforce the constructor to be what we expect
+        Class.prototype.constructor = Class;
+
+        // And make this class extendable
+        Class.extend = arguments.callee;
+
+        return Class;
+    };
 })();
 
 (function (window) {
@@ -167,7 +202,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         removeEventListener: function(f) {}
     };
 
-    Porthole.WindowProxyBase = Class.extend({
+    Porthole.WindowProxyBase = PortholeClass.extend({
         init: function(targetWindowName) {
             if (targetWindowName === undefined) {
                 targetWindowName = '';
@@ -244,7 +279,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
     Porthole.WindowProxyLegacy = Porthole.WindowProxyBase.extend({
         init: function(proxyIFrameUrl, targetWindowName) {
             this._super(targetWindowName);
-            
+
             if (proxyIFrameUrl !== null) {
                 this.proxyIFrameName = this.targetWindowName + 'ProxyIFrame';
                 this.proxyIFrameLocation = proxyIFrameUrl;
@@ -380,7 +415,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             return top;
         } else if (targetWindowName === 'top' || targetWindowName === 'parent') {
             return window[targetWindowName];
-        } 
+        }
         return parent.frames[targetWindowName];
     };
 
@@ -428,12 +463,12 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                 if (windowProxy) {
                     if (windowProxy.origin === message.targetOrigin || message.targetOrigin === '*') {
                         windowProxy.dispatchEvent(
-                          new Porthole.MessageEvent(message.data, message.sourceOrigin, windowProxy));
+                            new Porthole.MessageEvent(message.data, message.sourceOrigin, windowProxy));
                     } else {
                         Porthole.error('Target origin ' +
-                                       windowProxy.origin +
-                                       ' does not match desired target of ' +
-                                       message.targetOrigin);
+                            windowProxy.origin +
+                            ' does not match desired target of ' +
+                            message.targetOrigin);
                     }
                 } else {
                     Porthole.error('Could not find window proxy object on the target window');
@@ -448,13 +483,9 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         findWindowProxyObjectInWindow: function(w, sourceWindowName) {
             var i;
 
-            // IE does not enumerate global objects on the window object
-            if (w.RuntimeObject) {
-                w = w.RuntimeObject();
-            }
             if (w) {
                 for (i in w) {
-                    if (w.hasOwnProperty(i)) {
+                    if (Object.prototype.hasOwnProperty.call(w, i)) {
                         try {
                             // Ensure that we're finding the proxy object
                             // that is declared to be targetting the window that is calling us
@@ -480,8 +511,8 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         start: function() {
             if (window.addEventListener) {
                 window.addEventListener('resize',
-                                        Porthole.WindowProxyDispatcher.forwardMessageEvent,
-                                        false);
+                    Porthole.WindowProxyDispatcher.forwardMessageEvent,
+                    false);
             } else if (document.body.attachEvent) {
                 window.attachEvent('onresize', Porthole.WindowProxyDispatcher.forwardMessageEvent);
             } else {
