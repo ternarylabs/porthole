@@ -46,10 +46,10 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
-  this.Class = function(){};
+  this.PortholeClass = function(){};
   
   // Create a new Class that inherits from this class
-  Class.extend = function(prop) {
+  PortholeClass.extend = function(prop) {
     var _super = this.prototype;
     
     // Instantiate a base class (but only create the instance,
@@ -167,7 +167,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         removeEventListener: function(f) {}
     };
 
-    Porthole.WindowProxyBase = Class.extend({
+    Porthole.WindowProxyBase = PortholeClass.extend({
         init: function(targetWindowName) {
             if (targetWindowName === undefined) {
                 targetWindowName = '';
@@ -448,13 +448,9 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         findWindowProxyObjectInWindow: function(w, sourceWindowName) {
             var i;
 
-            // IE does not enumerate global objects on the window object
-            if (w.RuntimeObject) {
-                w = w.RuntimeObject();
-            }
             if (w) {
                 for (i in w) {
-                    if (w.hasOwnProperty(i)) {
+                    if (Object.prototype.hasOwnProperty.call(w, i)) {
                         try {
                             // Ensure that we're finding the proxy object
                             // that is declared to be targetting the window that is calling us
