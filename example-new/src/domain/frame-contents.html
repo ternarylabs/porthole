@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Porthole Guest Content</title>
+		<script type="text/javascript" src="http://##DOMAIN_PARENT##/porthole-demo/porthole.js"></script>
+		<script type="text/javascript">
+			function onMessage(messageEvent) {
+				if (messageEvent.data["color"]) {
+					document.body.bgColor = messageEvent.data["color"];
+				}
+			}
+			var windowProxy;
+			window.onload=function(){
+				windowProxy = new Porthole.WindowProxy("http://##DOMAIN_PARENT##/porthole-demo/proxy.html");
+				windowProxy.addEventListener(onMessage);
+			}
+		</script>
+	</head>
+	<body>
+		<p>
+			Hi, I am on served off of ##DOMAIN##
+		</p>
+		<p>
+			This is the content inside the guest frame. It does not have access to any elements from the parent page but can send and receive messages to it.
+		</p>
+		<p>
+			Click a button to communicate with the parent frame.
+		</p>
+		<div>
+			<input onclick="windowProxy.post({'color':'blue'});" type="submit" value="Color Parent Blue"/>
+			<input onclick="windowProxy.post({'color':'green'});" type="submit" value="Color Parent Green"/>
+			<input onclick="windowProxy.post({'expanded':true});" type="submit" value="Expand Me"/>
+			<input onclick="windowProxy.post({'expanded':false});" type="submit" value="Shrink Me"/>
+		</div>
+	</body>
+</html>
