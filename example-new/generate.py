@@ -15,20 +15,20 @@ shutil.rmtree("./build/domain")
 
 DOMAINS = {
     1 : {
-        'domain' : 'localhost1.2xlp.com',
-        'domain_parent' : 'localhost1.2xlp.com',
-        'domain_guest' : 'localhost1.destructuring.net',
+        'domain' : 'localhost1.2xlp.com',                       # domain for this frame
+        'domain_parent' : 'localhost1.2xlp.com',                # this should be equal
+        'domain_guest' : 'localhost1.destructuring.net',        # this is the domain to load a child off of
         
         
-        'domain_api_server' : 'localhost1.destructuring.net',
-        'domain_api_client' : 'localhost1.2xlp.com',
+        'domain_api_server' : 'localhost1.destructuring.net',   # used in our javascript example 
+        'domain_api_client' : 'localhost1.2xlp.com',            # used in our javascript example 
     },
     2 : {
-        'domain' : 'localhost1.destructuring.net',
-        'domain_parent' : 'localhost1.2xlp.com',
+        'domain' : 'localhost1.destructuring.net',              # domain for this frame
+        'domain_parent' : 'localhost1.2xlp.com',                # this should be our parent frame, domain 1
 
-        'domain_api_server' : 'localhost1.destructuring.net',
-        'domain_api_client' : 'localhost1.2xlp.com',
+        'domain_api_server' : 'localhost1.destructuring.net',   # used in our javascript example 
+        'domain_api_client' : 'localhost1.2xlp.com',            # used in our javascript example 
     },
 }
 

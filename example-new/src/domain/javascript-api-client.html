@@ -3,13 +3,11 @@
 	<head>
 		<title>Porthole Demo</title>
 		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/jquery.js"></script>
-		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/porthole.js"></script>
-		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/custom-api.js"></script>
-
+		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/custom-api-client.js"></script>
 
 		<script>
             $(document).ready(function(){
-				PortholeApi.init("http://##DOMAIN_API_SERVER##/porthole-demo")
+				PortholeApi.init('http://##DOMAIN_API_SERVER##/porthole-demo/')
 				test();
             });
         </script>

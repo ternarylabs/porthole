@@ -4,12 +4,13 @@
 		<title>Porthole Demo</title>
 		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/porthole.js"></script>
 		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/jquery.js"></script>
-		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/custom-api.js"></script>
+		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/custom-api-server.js"></script>
 
 
 		<script>
             $(document).ready(function(){
-				PortholeApiWorker.init("http://##DOMAIN_API_CLIENT##/porthole-demo")
+            	// we pass in the server as the default fallback. sometimes this works.
+				PortholeApiWorker.init('http://##DOMAIN_API_SERVER##/porthole-demo/')
             });
         </script>
 
