@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Porthole Demo</title>
+		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/jquery.js"></script>
+		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/porthole.js"></script>
+		<script type="text/javascript" src="http://##DOMAIN_API_SERVER##/porthole-demo/custom-api.js"></script>
+
+
+		<script>
+            $(document).ready(function(){
+				PortholeApi.init("http://##DOMAIN_API_SERVER##/porthole-demo")
+				test();
+            });
+        </script>
+
+
+	</head>
+	<body>
+		<p>
+			Hi, I am on served off of ##DOMAIN##.
+		</p>
+		<p>
+			This is content inside the parent window.  jquery is enabled.
+		</p>
+		<div id="portholeApiDiv" style="width:100px; height:100px;"></div>
+
+	</body>
+</html>

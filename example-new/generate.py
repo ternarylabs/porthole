@@ -17,11 +17,18 @@ DOMAINS = {
     1 : {
         'domain' : 'localhost1.2xlp.com',
         'domain_parent' : 'localhost1.2xlp.com',
-        'domain_guest' : 'localhost2.2xlp.com',
+        'domain_guest' : 'localhost1.destructuring.net',
+        
+        
+        'domain_api_server' : 'localhost1.destructuring.net',
+        'domain_api_client' : 'localhost1.2xlp.com',
     },
     2 : {
-        'domain' : 'localhost2.2xlp.com',
+        'domain' : 'localhost1.destructuring.net',
         'domain_parent' : 'localhost1.2xlp.com',
+
+        'domain_api_server' : 'localhost1.destructuring.net',
+        'domain_api_client' : 'localhost1.2xlp.com',
     },
 }
 
@@ -35,6 +42,11 @@ def replace_contents( filename , i ):
         modified = modified.replace( "##DOMAIN_GUEST##" , DOMAINS[i]['domain_guest'] )
     if 'domain_parent' in DOMAINS[i] :
         modified = modified.replace( "##DOMAIN_PARENT##" , DOMAINS[i]['domain_parent'] )
+    if 'domain_api_server' in DOMAINS[i] :
+        modified = modified.replace( "##DOMAIN_API_SERVER##" , DOMAINS[i]['domain_api_server'] )
+    if 'domain_api_client' in DOMAINS[i] :
+        modified = modified.replace( "##DOMAIN_API_CLIENT##" , DOMAINS[i]['domain_api_client'] )
+
     open(filename,'w').write(modified)
 
 for i in (1,2,):
@@ -49,6 +61,16 @@ for i in (1,2,):
     print "* Updating frame-contents.html for domains-%s" % i
     _fname = "./build/domain-%s/frame-contents.html" % i
     replace_contents( _fname , i )
+
+
+    print "* Updating javascript-api-client.html for domains-%s" % i
+    _fname = "./build/domain-%s/javascript-api-client.html" % i
+    replace_contents( _fname , i )
+
+    print "* Updating javascript-api-server-framed.html for domains-%s" % i
+    _fname = "./build/domain-%s/javascript-api-server-framed.html" % i
+    replace_contents( _fname , i )
+
 
 
 print "* Updating nginx.conf"
