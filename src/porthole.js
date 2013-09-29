@@ -465,8 +465,6 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
             var i;
 
             if (w) {
-                            alert(w.Porthole.WindowProxy);
-                            alert(w.window.Porthole.WindowProxy);
                 for (i in w) {
                     if (Object.prototype.hasOwnProperty.call(w, i)) {
                         try {
