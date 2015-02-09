@@ -1,20 +1,13 @@
 {
   "name": "porthole",
-  "version": "15.1.28",
+  "version": "1.0.0",
   "homepage": "http://ternarylabs.github.com/porthole",
   "authors": [
-    "Georges Auberger <georges@auberger.com>"
+    "Ternary Labs"
   ],
   "description": "A proxy to safely communicate to cross-domain iframes in javascript",
   "moduleType": [
     "globals"
   ],
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ]
+  "license": "MIT"
 }
