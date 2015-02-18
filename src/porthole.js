@@ -228,10 +228,10 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         dispatchEvent: function(event) {
             var i;
             for (i = 0; i < this.eventListeners.length; i++) {
-                try {
+                //try {
                     this.eventListeners[i](event);
-                } catch(e) {
-                }
+                //} catch(e) {
+                //}
             }
         }
     });
@@ -472,7 +472,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                             // that is declared to be targetting the window that is calling us
                             if (w[i] !== null &&
                                 typeof w[i] === 'object' &&
-                                w[i] instanceof w.Porthole.WindowProxy &&
+                                w[i] instanceof w.Porthole.WindowProxyBase &&
                                 w[i].getTargetWindowName() === sourceWindowName) {
                                 return w[i];
                             }
