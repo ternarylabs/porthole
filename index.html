@@ -28,9 +28,7 @@
         </ul>
       </header>
       <section>
-        <p><img src="http://cdn.ternarylabs.com/media/2011/03/porthole_210x209.jpg" width="210" height="209"></p>
-
-<p><a href="https://github.com/ternarylabs/porthole/">Porthole</a> is a small Javascript library that makes it safe and easy to communicate with cross domain iFrames. Porthole relies on hidden iFrames (later referred to a as proxy) to exchange information. The caller sets a url fragment with the message to pass. The proxy by virtue of being served from the same origin as the callee, invokes a callback method with an event object that contains the message read from the url fragment. The message signaling mechanism is based on a resize event.</p>
+        <p><a href="https://github.com/ternarylabs/porthole/">Porthole</a> is a small Javascript library that makes it safe and easy to communicate with cross domain iFrames. Porthole relies on hidden iFrames (later referred to a as proxy) to exchange information. The caller sets a url fragment with the message to pass. The proxy by virtue of being served from the same origin as the callee, invokes a callback method with an event object that contains the message read from the url fragment. The message signaling mechanism is based on a resize event.</p>
 
 <p>Learn more about <a href="http://ternarylabs.com/2011/03/27/secure-cross-domain-iframe-communication/">Porthole</a>.</p>
 
@@ -51,16 +49,16 @@
 
 <p>Include the Javascript.</p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s1"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s1"><span class="pl-pds">"</span>porthole.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>porthole.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
 
 <p>Create your content iFrame. This is where the guest content lives. Make sure to give it a name.</p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">iframe</span> <span class="pl-e">id</span>=<span class="pl-s1"><span class="pl-pds">"</span>guestFrame<span class="pl-pds">"</span></span> <span class="pl-e">name</span>=<span class="pl-s1"><span class="pl-pds">"</span>guestFrame<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s1"><span class="pl-pds">"</span>http://other-domain.com/<span class="pl-pds">"</span></span>&gt;
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">iframe</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>guestFrame<span class="pl-pds">"</span></span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>guestFrame<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>http://other-domain.com/<span class="pl-pds">"</span></span>&gt;
 &lt;/<span class="pl-ent">iframe</span>&gt;</pre></div>
 
 <p>Define an event handler if you want to receive messages.</p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-st">function</span> <span class="pl-en">onMessage</span>(<span class="pl-vpf">messageEvent</span>) {  
+<div class="highlight highlight-javascript"><pre><span class="pl-k">function</span> <span class="pl-en">onMessage</span>(<span class="pl-smi">messageEvent</span>) {  
     <span class="pl-c">/*</span>
 <span class="pl-c">   messageEvent.origin: Protocol and domain origin of the message</span>
 <span class="pl-c">   messageEvent.data: Message itself</span>
@@ -70,12 +68,12 @@
 
 <p>Create a window proxy object on the main page.</p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> windowProxy;
-<span class="pl-s3">window</span>.<span class="pl-en">onload</span><span class="pl-k">=</span><span class="pl-st">function</span>(){ 
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> windowProxy;
+<span class="pl-c1">window</span>.<span class="pl-en">onload</span><span class="pl-k">=</span><span class="pl-k">function</span>(){ 
     <span class="pl-c">// Create a proxy window to send to and receive </span>
     <span class="pl-c">// messages from the iFrame</span>
     windowProxy <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Porthole.WindowProxy</span>(
-        <span class="pl-s1"><span class="pl-pds">'</span>http://other-domain.com/proxy.html<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>guestFrame<span class="pl-pds">'</span></span>);
+        <span class="pl-s"><span class="pl-pds">'</span>http://other-domain.com/proxy.html<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>guestFrame<span class="pl-pds">'</span></span>);
 
     <span class="pl-c">// Register an event handler to receive messages;</span>
     windowProxy.addEventListener(onMessage);
@@ -83,29 +81,29 @@
 
 <p>Create a window proxy object in the iFrame.</p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> windowProxy;
-<span class="pl-s3">window</span>.<span class="pl-en">onload</span><span class="pl-k">=</span><span class="pl-st">function</span>(){ 
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> windowProxy;
+<span class="pl-c1">window</span>.<span class="pl-en">onload</span><span class="pl-k">=</span><span class="pl-k">function</span>(){ 
     <span class="pl-c">// Create a proxy window to send to and receive </span>
     <span class="pl-c">// messages from the parent</span>
     windowProxy <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Porthole.WindowProxy</span>(
-        <span class="pl-s1"><span class="pl-pds">'</span>http://parent-domain.com/proxy.html<span class="pl-pds">'</span></span>);
+        <span class="pl-s"><span class="pl-pds">'</span>http://parent-domain.com/proxy.html<span class="pl-pds">'</span></span>);
 
     <span class="pl-c">// Register an event handler to receive messages;</span>
-    windowProxy.addEventListener(<span class="pl-st">function</span>(<span class="pl-vpf">event</span>) { 
+    windowProxy.addEventListener(<span class="pl-k">function</span>(<span class="pl-smi">event</span>) { 
         <span class="pl-c">// handle event</span>
     });
 };</pre></div>
 
 <p>Host a proxy.html file on each domain. The proxy simply starts the dispatcher.</p>
 
-<div class="highlight highlight-html"><pre>&lt;!DOCTYPE html PUBLIC <span class="pl-s1">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> <span class="pl-s1">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span>&gt;
-&lt;<span class="pl-ent">html</span> <span class="pl-e">xmlns</span>=<span class="pl-s1"><span class="pl-pds">"</span>http://www.w3.org/1999/xhtml<span class="pl-pds">"</span></span>&gt;
+<div class="highlight highlight-html"><pre>&lt;!DOCTYPE html PUBLIC <span class="pl-s">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> <span class="pl-s">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span>&gt;
+&lt;<span class="pl-ent">html</span> <span class="pl-e">xmlns</span>=<span class="pl-s"><span class="pl-pds">"</span>http://www.w3.org/1999/xhtml<span class="pl-pds">"</span></span>&gt;
     &lt;<span class="pl-ent">head</span>&gt;
         <span class="pl-c">&lt;!-- Replace the url with your own location --&gt;</span>
-<span class="pl-s2">        &lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s1"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s1"><span class="pl-pds">"</span>https://raw.github.com/ternarylabs/porthole/master/src/porthole.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</span>
-<span class="pl-s2">        &lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s1"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span>&gt;</span>
-<span class="pl-s2">            <span class="pl-s3">window</span>.<span class="pl-en">onload</span><span class="pl-k">=</span><span class="pl-st">function</span>(){ Porthole.WindowProxyDispatcher.<span class="pl-sc">start</span>(); };</span>
-<span class="pl-s2">        &lt;/<span class="pl-ent">script</span>&gt;</span>
+<span class="pl-s1">        &lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://raw.github.com/ternarylabs/porthole/master/src/porthole.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</span>
+<span class="pl-s1">        &lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span>&gt;</span>
+<span class="pl-s1">            <span class="pl-c1">window</span>.<span class="pl-en">onload</span><span class="pl-k">=</span><span class="pl-k">function</span>(){ Porthole.WindowProxyDispatcher.<span class="pl-c1">start</span>(); };</span>
+<span class="pl-s1">        &lt;/<span class="pl-ent">script</span>&gt;</span>
     &lt;/<span class="pl-ent">head</span>&gt;
     &lt;<span class="pl-ent">body</span>&gt;
     &lt;/<span class="pl-ent">body</span>&gt;
@@ -113,7 +111,7 @@
 
 <p>Send a message.</p>
 
-<div class="highlight highlight-javascript"><pre>windowProxy.post({<span class="pl-s1"><span class="pl-pds">'</span>action<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>supersizeme<span class="pl-pds">'</span></span>});</pre></div>
+<div class="highlight highlight-javascript"><pre>windowProxy.post({<span class="pl-s"><span class="pl-pds">'</span>action<span class="pl-pds">'</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>supersizeme<span class="pl-pds">'</span></span>});</pre></div>
 
 <p>Note that if you have multiple iFrames, you can create as many WindowProxy objects as needed.</p>
 
