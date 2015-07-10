@@ -132,7 +132,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
          * @private
          */
         error: function(s) {
-            if (window.console !== undefined) {
+            if (typeof window.console !== undefined && typeof window.console.error === 'function') {
                 window.console.error('Porthole: ' + s);
             }
         }
@@ -231,6 +231,7 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
                 try {
                     this.eventListeners[i](event);
                 } catch(e) {
+                    Porthole.error(e);
                 }
             }
         }
