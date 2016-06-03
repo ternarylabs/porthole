@@ -43,11 +43,12 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
  * MIT Licensed.
  */
 // Inspired by base2 and Prototype
-(function(){
+(function(window){
+    'use strict';
     var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
 
     // The base Class implementation (does nothing)
-    this.PortholeClass = function(){};
+    var PortholeClass = function(){};
 
     // Create a new Class that inherits from this class
     PortholeClass.extend = function(prop) {
@@ -97,14 +98,10 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
         Class.prototype.constructor = Class;
 
         // And make this class extendable
-        Class.extend = arguments.callee;
+        Class.extend = PortholeClass.extend;
 
         return Class;
     };
-})();
-
-(function (window) {
-    'use strict';
 
     /**
      * @overview Porthole, JavaScript Library for Secure Cross Domain iFrame Communication.
@@ -509,9 +506,9 @@ iFrame proxy abc.com->abc.com: forwardMessageEvent(event)
     };
 
     // Support testing in node.js:
-    if (typeof window.exports !== 'undefined') {
-        window.exports.Porthole = Porthole;
+    if (typeof exports !== 'undefined') {
+        module.exports = Porthole;
     } else {
         window.Porthole = Porthole;
     }
-})(this);
+})(typeof window !== "undefined" ? window : this);
