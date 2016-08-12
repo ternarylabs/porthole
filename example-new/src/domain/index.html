@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Porthole Demo</title>
+		<script type="text/javascript" src="http://##DOMAIN_PARENT##/porthole-demo/porthole.js"></script>
+		<script type="text/javascript">
+			var guestDomain = '##DOMAIN_GUEST##';
+
+			function onMessage1(messageEvent) {
+				if (messageEvent.origin == "http://" + guestDomain) {
+					if (messageEvent.data["color"]) {
+						document.body.bgColor = messageEvent.data["color"];
+					}
+					if (messageEvent.data["expanded"]) {
+						el = document.getElementById('guestFrame1');
+						el.setAttribute('height', "250px");
+					} else {
+						el = document.getElementById('guestFrame1');
+						el.setAttribute('height', "150px");
+					}
+				}
+			}
+
+			/*
+				Use a different message handler for the 2nd window so we can customize the meaning of expand/collapse
+				messages for instance.
+			*/
+			function onMessage2(messageEvent) {
+				if (messageEvent.origin == "http://" + guestDomain) {
+					if (messageEvent.data["color"]) {
+						document.body.bgColor = messageEvent.data["color"];
+					}
+					if (messageEvent.data["expanded"]) {
+						el = document.getElementById('guestFrame2');
+						el.setAttribute('width', "600px");
+					} else {
+						el = document.getElementById('guestFrame2');
+						el.setAttribute('width', "500px");
+					}
+				}
+			}
+
+			var windowProxy1, windowProxy2;
+			window.onload=function(){
+					// Create a proxy window to send to and receive message from the guest iframe
+					windowProxy1 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole-demo/proxy.html', 'guestFrame1');
+					windowProxy1.addEventListener(onMessage1);
+
+					// Create a proxy window to send to and receive message from the guest iframe
+					windowProxy2 = new Porthole.WindowProxy('http://' + guestDomain + '/porthole-demo/proxy.html', 'guestFrame2');
+					windowProxy2.addEventListener(onMessage2);
+			};
+		</script>
+	</head>
+	<body>
+		<p>
+			Hi, I am on served off of ##DOMAIN##
+		</p>
+		<p>
+			This is content inside the parent window.
+		</p>
+		<p>
+			Click a button to communicate with the child frames.
+		</p>
+		<div>
+			<input onclick="windowProxy1.post({'color':'red'})" type="submit" value="Color Frame1 Red" />
+			<input onclick="windowProxy2.post({'color':'yellow'})" type="submit" value="Color Frame2 Yellow" />
+		</div>
+		<div>
+			<h3>Frame 1</h3>
+			<iframe id="guestFrame1" name="guestFrame1" width="500px" height="150px" frameborder="1" src="http://##DOMAIN_GUEST##/porthole-demo/frame-contents.html" scrolling="no"></iframe>
+		</div>
+		<div>
+			<h3>Frame 2</h3>
+			<iframe id="guestFrame2" name="guestFrame2" width="500px" height="150px" frameborder="1" src="http://##DOMAIN_GUEST##/porthole-demo/frame-contents.html" scrolling="no"></iframe>
+		</div>
+	</body>
+</html>
